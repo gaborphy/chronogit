@@ -27,3 +27,31 @@ def clone_repo_full(git_url: str, target_dir: str="repos") -> str:
     subprocess.run(["git", "clone", git_url, clone_path], check=True)
     print("✅ Clone complete.")
     return clone_path
+
+def extract_repo_name(git_url: str) -> str:
+    """
+    Extract the repository name from a git URL.
+
+    Args:
+        git_url (str): The URL of the git repository.
+
+    Returns:
+        str: The name of the repository.
+    """
+    return Path(urlparse(git_url).path).stem
+
+def clone_repo_if_needed(url: str, base_dir: str = "repos") -> str:
+    """
+    Clone a repo if it doesn't exist locally. Return the local path.
+    """
+    repo_name = extract_repo_name(url)
+    repo_path = os.path.join(base_dir, repo_name)
+
+    if os.path.exists(repo_path):
+        print(f"✅ Repo already exists at {repo_path}, skipping clone.")
+    else:
+        print(f"🔁 Cloning {url} into {repo_path}...")
+        os.makedirs(base_dir, exist_ok=True)
+        subprocess.run(["git", "clone", url, repo_path], check=True)
+
+    return repo_path

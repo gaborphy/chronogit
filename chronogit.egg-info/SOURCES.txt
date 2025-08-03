@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+setup.cfg
+chronogit/__init__.py
+chronogit/code_analyzer.py
+chronogit/committer_resolver.py
+chronogit/db.py
+chronogit/git_parser.py
+chronogit/utils.py
+chronogit.egg-info/PKG-INFO
+chronogit.egg-info/SOURCES.txt
+chronogit.egg-info/dependency_links.txt
+chronogit.egg-info/top_level.txt
+tests/test_git_parser.py

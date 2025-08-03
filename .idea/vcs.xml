@@ -4,5 +4,6 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/repos/accuweather" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/repos/machinelearning" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/repos/numpy" vcs="Git" />
   </component>
 </project>
