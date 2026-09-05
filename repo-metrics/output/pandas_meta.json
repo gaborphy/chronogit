@@ -1,0 +1,13 @@
+{
+  "repo": "pandas",
+  "url": "https://github.com/pandas-dev/pandas.git",
+  "head_sha": "04dff44f6224b15ed647ad5cd865905bca8b116e",
+  "head_committer_date": "2026-09-04T21:55:38-07:00",
+  "since": "2014-01-01",
+  "until": "2026-09-05",
+  "extraction_date_utc": "2026-09-05T07:52:05.277723+00:00",
+  "clone_size_bytes": 450551808,
+  "clone_elapsed_s": 18.7,
+  "panel_a_rows": 23579,
+  "panel_b_rows": 51
+}
