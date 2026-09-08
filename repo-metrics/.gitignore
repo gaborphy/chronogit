@@ -1,4 +1,6 @@
 clones/
+clones-vintage/
 *.log
 *.tmp
 __pycache__/
+*.html

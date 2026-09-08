@@ -133,3 +133,82 @@ Panel-A-derived contributor count for the same repo-quarter.
 See `output/<repo>_meta.json` per repo for: `head_sha`,
 `head_committer_date`, `since`/`until`, `extraction_date_utc`,
 `clone_size_bytes`, `clone_elapsed_s`, and row counts for both panels.
+
+---
+
+## Vintage-cohort study (separate from the above)
+
+A second, independent study (`src/vintage_discover.py` /
+`vintage_extract.py` / `vintage_analysis.py` / `vintage_charts.py`,
+findings in `VINTAGE_REPORT.md`) asks a different question: not "how has
+this fixed set of mature projects changed over time" but "how does the
+*starting* structure of newly-created packages differ depending on when
+they were born." Sample: ~10 packages per birth quarter, 2014Q1–2026Q3
+(51 quarters, 490 packages total).
+
+**Discovery.** GitHub's search API, `language:Python fork:false
+created:<quarter-range>`, sorted by stars, one request per quarter
+(unauthenticated search is rate-limited to 10/min; the much stingier
+60/hour unauthenticated *core* API is deliberately never called during
+discovery). Candidates are over-fetched (25/quarter) because most
+star-ranked "Python" repos are not packages at all.
+
+**"Is this actually a package" check.** Deferred to right after a
+`--no-checkout` clone (a local `git ls-tree`, not a GitHub API call — see
+above): requires `setup.py`, `pyproject.toml`, or `setup.cfg` at repo
+root, and at least 2 in-scope `.py` files at the measurement snapshot
+specifically (checking only at HEAD isn't enough — a snapshot from
+shortly after birth can be far sparser than the repo is today; caught
+live when `vinta/awesome-python`, a curated markdown list with 319k
+stars, passed a HEAD-only check but had exactly 1 in-scope file 180 days
+after its first commit). Of 978 candidates scanned, 358 were rejected
+purely for lacking a manifest — a majority of "language:Python, sorted by
+stars" results are not installable packages.
+
+**Vintage vs. actual coding start.** GitHub's `created_at` is when the
+*repository object* was created, which can diverge sharply from when the
+code was actually first written — an existing project rehosted with
+preserved history (`googleapis/google-api-python-client`: GitHub says
+"created 2014Q1," git says first commit 2010, 1360 days earlier), or a
+repo slot that sat empty/was transferred before real development started
+(`seleniumbase/SeleniumBase`: "created" 2014Q1, real first commit late
+2015, 640 days later). Both directions are rejected when
+`|created_at − true_first_commit| > 180 days` (78 of 490 rejections were
+this filter) — the vintage label is a package's actual git history, not
+GitHub repo metadata.
+
+**Snapshot timing.** Each package is measured once, at its first commit
+date + 180 days (or "now" if younger — 18 of 490 packages, all from the
+most recent couple of quarters, are flagged `is_young_partial=1`), using
+the same Panel-B state extraction and a Panel-A-style flow rollup over
+just that package's pre-snapshot history. This holds *age* constant
+across cohorts rather than calendar date, so a 2014-born and a
+2025-born package are compared at the same point in their own lifecycle.
+
+*Known git gotcha, worth restating because it's easy to reintroduce:*
+`git log --reverse --format=... -1` does **not** give the oldest commit —
+`-1` limits the (newest-first) traversal before `--reverse` reorders
+whatever survived that limit, so it silently returns HEAD's date instead.
+Confirmed live on `wagtail/wagtail` during validation (buggy command
+returned today's date; the fix — fetch the full reversed list, take the
+first line — returned the real 2014-01-22 first commit). `vintage_extract.py`
+uses the fix; `commit_at_or_before()` in `panel_b.py` is unaffected (no
+`--reverse`, different semantics).
+
+**Aggregation is median-based, not mean-based**, unlike the calendar-time
+study: with only 7–10 packages per quarter and a handful of commits per
+young package, one outlier package dominates a mean in a way it can't
+dominate a median. `vintage_quarterly.csv` carries both, plus p25/p75.
+
+**Selection-bias caveat that does not apply to the calendar-time study
+above:** ranking by accumulated stars is a weaker, noisier signal for
+recent quarters (less time to accumulate) than for old ones, and several
+2025–2026 candidates showed star counts implausible for their age,
+consistent with known GitHub star-inflation in the current AI-tooling
+gold rush. Metrics tied directly to popularity/reach (contributor count,
+commit count) should be read as *upper bounds on the most-quickly-visible
+packages of each era*, not as population averages — and are additionally
+confounded by GitHub's own userbase growth across 2014–2026. Code-shape
+metrics (function length, complexity, docstring rate) are one step
+removed from that confound but not immune to it either — see
+`VINTAGE_REPORT.md` for the full discussion.

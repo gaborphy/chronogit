@@ -40,16 +40,18 @@ FIELDNAMES = [
 _MARK = "\x01CG\x01"
 
 
-def _log_p_command(since: str) -> list[str]:
+def _log_p_command(since: str, until: Optional[str] = None) -> list[str]:
     fmt = f"{_MARK}%H\x01%at\x01%an"
-    return [
+    cmd = [
         "git", "log",
         "--reverse", "--no-merges", "--no-renames",
         "-U0",
         f"--since={since}",
-        f"--format={fmt}",
-        "--", "*.py",
     ]
+    if until:
+        cmd.append(f"--until={until}")
+    cmd += [f"--format={fmt}", "--", "*.py"]
+    return cmd
 
 
 class _CommitAcc:
@@ -109,14 +111,15 @@ def _classify_added_line(content: str, acc: _CommitAcc) -> None:
     acc.added_code_chars += len(content.rstrip("\n").rstrip("\r"))
 
 
-def stream_panel_a(repo_dir: str, repo_name: str, since: str, out_fh: IO[str]) -> int:
+def stream_panel_a(repo_dir: str, repo_name: str, since: str, out_fh: IO[str],
+                    until: Optional[str] = None) -> int:
     """Run `git log -p` in *repo_dir*, write Panel A rows to *out_fh* as we
     go, return the number of commit rows written.
     """
     writer = csv.DictWriter(out_fh, fieldnames=FIELDNAMES)
     writer.writeheader()
 
-    cmd = _log_p_command(since)
+    cmd = _log_p_command(since, until)
     stderr_tmp = tempfile.TemporaryFile(mode="w+")
     proc = subprocess.Popen(
         cmd, cwd=repo_dir, stdout=subprocess.PIPE, stderr=stderr_tmp,
