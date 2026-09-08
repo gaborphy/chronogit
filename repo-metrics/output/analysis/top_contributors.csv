@@ -1,0 +1,11 @@
+repo,author,commits,total_commits,share
+pandas,jbrockmendel,5495,23548,0.23335315101070156
+numpy,Sebastian Berg,962,11215,0.08577797592510031
+scipy,Matt Haberland,1833,16635,0.11018935978358882
+scikit-learn,Guillaume Lemaitre,538,12779,0.042100320838876285
+matplotlib,Antony Lee,3616,21291,0.1698370203372317
+django,Tim Graham,1677,12670,0.13235990528808209
+sqlalchemy,Mike Bayer,3990,5628,0.7089552238805971
+sympy,Oscar Benjamin,1913,30527,0.06266583680020965
+ipython,Matthias Bussonnier,1070,6783,0.15774730945009582
+pytest,Bruno Oliveira,1060,5988,0.17702070808283232
