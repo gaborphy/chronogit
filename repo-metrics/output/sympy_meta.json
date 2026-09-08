@@ -1,0 +1,13 @@
+{
+  "repo": "sympy",
+  "url": "https://github.com/sympy/sympy.git",
+  "head_sha": "3cbbd286f761fce70f38a94d982b6f485cfd4fd3",
+  "head_committer_date": "2026-09-07T21:26:55+01:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T17:07:28.687277+00:00",
+  "clone_size_bytes": 215572480,
+  "clone_elapsed_s": 9.7,
+  "panel_a_rows": 30644,
+  "panel_b_rows": 51
+}

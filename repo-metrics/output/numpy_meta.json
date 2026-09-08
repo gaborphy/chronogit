@@ -1,0 +1,13 @@
+{
+  "repo": "numpy",
+  "url": "https://github.com/numpy/numpy.git",
+  "head_sha": "d9079517ca17819bca8cbc1587ea9047f8a56ecf",
+  "head_committer_date": "2026-09-08T10:00:37-06:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T16:54:15.765100+00:00",
+  "clone_size_bytes": 211861504,
+  "clone_elapsed_s": 10.5,
+  "panel_a_rows": 11250,
+  "panel_b_rows": 51
+}

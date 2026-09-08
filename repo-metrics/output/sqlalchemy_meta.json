@@ -1,0 +1,13 @@
+{
+  "repo": "sqlalchemy",
+  "url": "https://github.com/sqlalchemy/sqlalchemy.git",
+  "head_sha": "121d0cde4679845a37f39ea36fa16cb2039a82ce",
+  "head_committer_date": "2026-09-08T16:52:48Z",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T17:03:34.119249+00:00",
+  "clone_size_bytes": 126042112,
+  "clone_elapsed_s": 6.8,
+  "panel_a_rows": 5628,
+  "panel_b_rows": 51
+}

@@ -1,0 +1,13 @@
+{
+  "repo": "django",
+  "url": "https://github.com/django/django.git",
+  "head_sha": "fc4eaaabf419508ea39d750ca5ca801d933e0b16",
+  "head_committer_date": "2026-09-08T12:45:54-04:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T16:58:36.864181+00:00",
+  "clone_size_bytes": 321036288,
+  "clone_elapsed_s": 11.1,
+  "panel_a_rows": 12711,
+  "panel_b_rows": 51
+}

@@ -1,0 +1,13 @@
+{
+  "repo": "scikit-learn",
+  "url": "https://github.com/scikit-learn/scikit-learn.git",
+  "head_sha": "2cc7893a2097be891426ca6a4d9ea2e14cf82b9c",
+  "head_committer_date": "2026-09-08T12:24:37+02:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T16:56:16.193792+00:00",
+  "clone_size_bytes": 210718720,
+  "clone_elapsed_s": 7.9,
+  "panel_a_rows": 12833,
+  "panel_b_rows": 51
+}

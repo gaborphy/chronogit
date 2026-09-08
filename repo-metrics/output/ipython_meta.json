@@ -1,0 +1,13 @@
+{
+  "repo": "ipython",
+  "url": "https://github.com/ipython/ipython.git",
+  "head_sha": "e18b391ad00d77f4d7441bf8b340d03bfa4d4ca7",
+  "head_committer_date": "2026-09-07T20:51:33+02:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T17:07:51.970846+00:00",
+  "clone_size_bytes": 90923008,
+  "clone_elapsed_s": 4.0,
+  "panel_a_rows": 6906,
+  "panel_b_rows": 51
+}

@@ -1,0 +1,13 @@
+{
+  "repo": "scipy",
+  "url": "https://github.com/scipy/scipy.git",
+  "head_sha": "f389d8d3514b720452029c88fef930f0d9e8e618",
+  "head_committer_date": "2026-09-08T17:00:09+01:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T16:55:29.102063+00:00",
+  "clone_size_bytes": 228167680,
+  "clone_elapsed_s": 9.6,
+  "panel_a_rows": 16711,
+  "panel_b_rows": 51
+}

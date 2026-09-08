@@ -1,0 +1,13 @@
+{
+  "repo": "matplotlib",
+  "url": "https://github.com/matplotlib/matplotlib.git",
+  "head_sha": "8a621d3bbebbc480a7036ea19e82196e737f9f59",
+  "head_committer_date": "2026-09-08T12:30:00-04:00",
+  "since": "2014-01-01",
+  "until": "2026-09-08",
+  "extraction_date_utc": "2026-09-08T16:57:31.658788+00:00",
+  "clone_size_bytes": 531742720,
+  "clone_elapsed_s": 18.1,
+  "panel_a_rows": 21342,
+  "panel_b_rows": 51
+}
