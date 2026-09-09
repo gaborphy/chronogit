@@ -395,9 +395,16 @@ without the AI packages in the picture.</p>
 </ul>
 <p>This dataset cannot attribute any of this to AI-assisted authorship
 specifically — nothing here measures whether a given commit was written
-by a human or a coding assistant. That question needs the function-level
-AI detector elsewhere in this project (<code>chronogit/ai_detector.py</code>),
-applied to this same package sample, not a dependency-edge count.</p>
+by a human or a coding assistant; an AI/genAI SDK dependency is a <em>topic</em>
+signal (what a package is about), not a <em>usage</em> signal (how it was
+written). <strong><a href="AI_USAGE_REPORT.html">AI_USAGE_REPORT.md</a> measures the latter
+directly</strong> — commit trailers and config files that self-disclose an AI
+coding tool, read from the same 490 packages' git history — and finds
+self-disclosed AI-tool usage climbing from ~0% (pre-2022) to 89% of the
+(partial) 2026 cohort, overtaking AI-SDK topic dependence as the dominant
+signal by 2025. It's a floor, not a full measurement (most AI-assisted
+commits leave no trace at all), but it's direct evidence rather than an
+inference from what a package imports.</p>
 <h2 id="caveats">Caveats</h2>
 <ul>
 <li><strong>This sample is itself star-ranked at the source.</strong> The 490 newborn

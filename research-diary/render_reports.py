@@ -25,6 +25,7 @@ REPORTS = {
     "REPORT.md": "REPORT.html",
     "VINTAGE_REPORT.md": "VINTAGE_REPORT.html",
     "DEPENDENCY_REPORT.md": "DEPENDENCY_REPORT.html",
+    "AI_USAGE_REPORT.md": "AI_USAGE_REPORT.html",
     "README.md": "README.html",
 }
 
