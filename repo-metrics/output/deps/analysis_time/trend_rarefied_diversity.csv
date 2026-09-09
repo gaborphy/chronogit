@@ -1,0 +1,2 @@
+metric,first_value,last_value,ols_slope_per_period,ols_r2,ols_p,spearman_rho,spearman_p
+rarefied_unique_at_n,122.13,106.156,-0.20369230769230764,0.008305052334359807,0.7671619131627898,-0.005494505494505494,0.9857869107140623

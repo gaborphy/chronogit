@@ -5,7 +5,12 @@ is highly probably in the dependency list of a newly-created package.
 Answer, up front: **yes, decisively for stars and forks, more modestly for
 contributor count** — and the effect is not just "of course famous
 packages get used," it holds up against a genuine random-package baseline,
-not just against intuition.
+not just against intuition. A follow-up question — [is this effect
+getting stronger over time, and is that AI-driven?](#is-the-popularity-effect-increasing-over-time)
+— gets a more mixed answer: rising dependency popularity by cohort year,
+yes; newborn packages converging on a smaller, more repeated set of
+dependencies, no (a naive signal that doesn't survive a sample-size
+correction).
 
 ## Method
 
@@ -123,6 +128,129 @@ and 1,028) yet rank in the top 10 by fan-in — both are exactly the
 finding above predicts: broadly adopted despite modest visibility,
 because nearly every project needs them.
 
+## Is the popularity effect increasing over time?
+
+**Hypothesis under test:** the popularity effect above is getting
+stronger — newer packages, more likely built with AI assistance, converge
+on the same well-known dependencies more than older ones did. This needs
+two separate questions, and they get different answers:
+
+1. Are the dependencies newborn packages choose becoming *more popular*
+   over cohort years? — **partially, and only for some metrics.**
+2. Are newborn packages converging on a *smaller, more repeated set* of
+   dependencies over time (the "same packages again" part of the
+   hypothesis) — **no**, once you correct for an obvious confound.
+
+### Concentration: a naive signal that doesn't survive a sample-size check
+
+![Naive vs. rarefied concentration](output/deps/charts_time/concentration_naive_vs_rarefied.png)
+
+The direct way to test "are cohorts repeating the same names more" is to
+look at unique dependency names as a share of that cohort's total edges,
+or a Herfindahl-Hirschman Index (HHI) of how concentrated each cohort's
+edges are across names. Both *look* like they're rising: unique-names-per-edge
+drops from 0.80 (2014) to 0.54 (2026) (Spearman ρ=-0.86, p=0.0002), and
+HHI roughly doubles.
+
+**This is a sample-size artifact, not a behavioral change.** Edge volume
+grew 3–4× over the same window (294 edges in 2014 → 832 in 2023) simply
+because the corpus has more packages and each has more resolved
+dependencies in later cohorts — and drawing more names from any fixed
+pool mechanically produces more repeat collisions on already-seen names,
+shrinking the unique-ratio, with zero change in the underlying selection
+process required. The standard ecological fix is rarefaction: repeatedly
+subsample the *same* number of edges (140, picked below the smallest
+cohort's 143) from every year and compare the average number of distinct
+names recovered — an apples-to-apples diversity comparison that doesn't
+care how much total data a year happened to produce. Rarefied diversity
+is **flat across all 13 years** (Spearman ρ=-0.01, p=0.99) — no trend at
+all, well within year-to-year noise. Once sample size is controlled for,
+**there is no evidence that newborn packages are converging on a smaller
+set of dependencies now than they were in 2014.** The naive numbers were
+real, but they were measuring corpus growth, not choice behavior.
+
+A second, independent check points the same way: `share_edges_to_global_top20`
+— what fraction of each cohort's edges land on one of the all-time
+top-20 most-depended-on packages from the table above — has **no trend**
+either (p=0.48 by year, p=0.90 by quarter), bouncing between 0.13 and
+0.33 with no direction. Recent cohorts aren't leaning on *the same*
+famous packages any more than early cohorts did.
+
+### Popularity: rising for stars and forks, flat for contributors
+
+![Popularity of chosen dependencies over time](output/deps/charts_time/popularity_over_time.png)
+
+Median stars of a cohort's chosen dependencies rose from 2,206 (2014) to
+5,715 (2026) — noisy (one year, 2020, is a clear outlier at 11,259) but a
+real trend (Spearman ρ=0.77, p=0.002 by year; ρ=0.45, p=0.0008 by
+quarter). Median forks moves the same direction, more weakly (ρ=0.53,
+p=0.06 — suggestive, not clean). **Median lifetime contributor count of
+chosen dependencies shows no trend at all** (ρ=-0.18, p=0.55) — flat
+across the entire window. This is the same pattern as the main
+case-control result above: stars and forks move together and respond to
+whatever is driving this, contributor count doesn't, consistent with
+stars/forks being more of a visibility signal and contributor count
+reflecting something else (project age/size).
+
+**This finding carries a real confound the concentration one doesn't
+have**, and it needs to be stated plainly rather than after the fact:
+every popularity number in this whole report is measured *today* (2026),
+not at the moment each cohort actually made its choice. A dependency a
+2014-born package picked has had 12 more years to accumulate stars than
+one a 2025-born package picked yesterday. So this rising trend is
+consistent with "newer cohorts increasingly pick already-famous
+packages" — but it's equally consistent with "cohorts of every era pick
+similarly-positioned packages, and the ones from 2014 just kept
+accumulating stars in the years since." This dataset cannot separate
+those two stories; doing so would need each dependency's star count *at
+the time it was chosen*, which isn't available from ecosyste.ms's
+current-snapshot data.
+
+### The AI/genAI adoption timing is real and rules out one alternative explanation
+
+![AI SDK adoption over time](output/deps/charts_time/ai_sdk_adoption.png)
+
+Edges to a curated list of LLM/genAI SDK packages (`openai`, `anthropic`,
+`transformers`, `langchain*`, `tiktoken`, `huggingface-hub`, and similar —
+deliberately excluding generic ML frameworks like `torch` that predate
+and extend well beyond the recent LLM wave) go from essentially zero
+before 2022 to 5–11% of all dependency edges in 2023–2026, tracking the
+November 2022 ChatGPT release almost exactly. That part of the
+hypothesis — newborn packages increasingly building on AI/LLM tooling —
+is unambiguously true in this data.
+
+What it does **not** do is explain away the concentration finding, because
+there's nothing to explain away: re-running both the naive and rarefied
+concentration tests with all AI/genAI SDK edges excluded barely moves
+either number (unique-ratio trend: ρ=-0.76, p=0.002, vs. ρ=-0.86 with
+them included — the naive "decline" persists without AI packages, exactly
+as sample-size math predicts it should, since removing 294 of 5,231 edges
+barely changes cohort sizes). This was checked specifically to rule out
+"concentration looks like it's rising only because more recent packages
+are themselves AI wrappers sharing 2–3 SDK imports" — that's not what's
+happening; there's no real concentration trend to begin with, with or
+without the AI packages in the picture.
+
+### Verdict on the hypothesis
+
+- "New packages are more likely based on AI usage" — **supported**,
+  clearly and specifically (the AI/genAI SDK adoption timing above).
+- "They are using the mostly used packages again [more than before]" —
+  **not supported**. The concentration signal that would show this
+  doesn't survive a sample-size correction, and reliance on the specific
+  set of all-time-popular packages is flat over 13 years.
+- The weaker, adjacent claim — chosen dependencies are trending toward
+  higher star/fork counts over cohort years — **holds up statistically**,
+  but is measured against present-day popularity, not popularity at the
+  time of choice, so it cannot on its own establish that recency itself
+  (let alone AI usage specifically) is the cause.
+
+This dataset cannot attribute any of this to AI-assisted authorship
+specifically — nothing here measures whether a given commit was written
+by a human or a coding assistant. That question needs the function-level
+AI detector elsewhere in this project (`chronogit/ai_detector.py`),
+applied to this same package sample, not a dependency-edge count.
+
 ## Caveats
 
 - **This sample is itself star-ranked at the source.** The 490 newborn
@@ -157,5 +285,9 @@ because nearly every project needs them.
 - Random baseline sample: `output/deps/baseline_popularity.csv`
 - Case-control test, fan-in correlation, tier breakdowns, top-20 table:
   `output/deps/analysis/*.csv`
+- Time-dimension: per-year/quarter concentration and popularity stats,
+  rarefied-diversity results, AI/genAI-SDK-excluded robustness check:
+  `output/deps/analysis_time/*.csv`
 - Regenerate: `python3 src/deps_extract.py && python3 src/deps_popularity.py
-  && python3 src/deps_analysis.py && python3 src/deps_charts.py`
+  && python3 src/deps_analysis.py && python3 src/deps_charts.py
+  && python3 src/deps_time_analysis.py && python3 src/deps_time_charts.py`
