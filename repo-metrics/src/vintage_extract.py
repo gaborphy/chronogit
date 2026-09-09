@@ -37,7 +37,7 @@ PROGRESS_PATH = VINTAGE_DIR / "progress.json"
 PACKAGES_CSV = VINTAGE_DIR / "packages.csv"
 CLONES_DIR = ROOT / "clones-vintage"
 
-TARGET_PER_QUARTER = 10
+TARGET_PER_QUARTER = 30
 MIN_PY_FILES = 2
 MANIFEST_NAMES = {"setup.py", "pyproject.toml", "setup.cfg"}
 CLONE_TIMEOUT_S = 180

@@ -174,27 +174,41 @@ def main() -> None:
     out_path = AI_SIGNAL_DIR / "ai_signals.csv"
 
     pkgs = pd.read_csv(VINTAGE_DIR / "packages.csv")
-    log(f"Scanning {len(pkgs)} packages for AI-tool commit/marker-file signals ...")
 
-    with open(out_path, "w", newline="") as fh:
+    done: set[str] = set()
+    if out_path.exists():
+        done = set(pd.read_csv(out_path)["repo_full_name"])
+        log(f"Resuming: {len(done)} packages already processed.")
+
+    pending = pkgs[~pkgs["repo_full_name"].isin(done)]
+    log(f"Scanning {len(pending)} packages for AI-tool commit/marker-file signals "
+        f"({len(pkgs)} total, {len(done)} already done) ...")
+
+    mode = "a" if out_path.exists() else "w"
+    with open(out_path, mode, newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=ROW_FIELDNAMES)
-        writer.writeheader()
+        if mode == "w":
+            writer.writeheader()
         n_ai = 0
-        for i, row in pkgs.iterrows():
+        n_done_this_run = 0
+        for i, row in pending.iterrows():
             result = process_one(row)
             if result is None:
                 continue
             writer.writerow(result)
             fh.flush()
+            n_done_this_run += 1
             if result["ai_commits"] > 0 or result["marker_files_found"]:
                 n_ai += 1
                 log(f"  [{row['vintage_quarter']}] {row['repo_full_name']}: "
                     f"ai_commits={result['ai_commits']}/{result['total_commits']} "
                     f"tools={result['tools_matched']!r} markers={result['marker_files_found']!r}")
-            if (i + 1) % 50 == 0:
-                log(f"  {i + 1}/{len(pkgs)} processed, {n_ai} with any AI signal so far ...")
+            if n_done_this_run % 50 == 0:
+                log(f"  {n_done_this_run}/{len(pending)} processed this run "
+                    f"({len(done) + n_done_this_run}/{len(pkgs)} total), "
+                    f"{n_ai} with any AI signal so far ...")
 
-    log(f"Done. Wrote {out_path}. {n_ai}/{len(pkgs)} packages showed some AI-tool signal.")
+    log(f"Done. Wrote {out_path}. {n_ai}/{len(pending)} newly-processed packages showed some AI-tool signal.")
 
 
 if __name__ == "__main__":

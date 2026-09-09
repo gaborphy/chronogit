@@ -1,7 +1,7 @@
 group,metric,n,mean,median,p25,p75,p90
-dependency_set,stargazers_count,1513,7283.485789821547,1191.0,292.0,5378.0,15495.0
-dependency_set,forks_count,1513,1287.4904163912756,196.0,56.0,865.0,2625.0
-dependency_set,total_committers,1242,206.74718196457326,47.0,20.0,144.0,506.0
-baseline_set,stargazers_count,219,496.8904109589041,2.0,0.0,12.0,233.0
-baseline_set,forks_count,219,107.22374429223744,0.0,0.0,4.0,71.0
-baseline_set,total_committers,41,98.1951219512195,13.0,3.0,47.0,245.0
+dependency_set,stargazers_count,2788,5571.9856527977045,813.0,194.0,3498.0,10939.0
+dependency_set,forks_count,2788,990.127331420373,119.0,38.0,534.0,2006.0
+dependency_set,total_committers,2173,159.81132075471697,36.0,14.0,110.0,358.0
+baseline_set,stargazers_count,213,407.7136150234742,3.0,0.0,28.0,343.0
+baseline_set,forks_count,213,136.75586854460093,1.0,0.0,10.0,185.0
+baseline_set,total_committers,47,148.80851063829786,11.0,3.0,51.0,322.0

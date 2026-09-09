@@ -33,7 +33,7 @@ ROOT = Path(__file__).resolve().parent.parent
 VINTAGE_DIR = ROOT / "output" / "vintage"
 CANDIDATES_PATH = VINTAGE_DIR / "candidates.json"
 
-PER_PAGE = 25
+PER_PAGE = 100  # GitHub search API max per page
 REQUEST_DELAY_S = 7.0
 SEARCH_URL = "https://api.github.com/search/repositories"
 

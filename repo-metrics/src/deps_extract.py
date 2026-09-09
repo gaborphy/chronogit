@@ -224,26 +224,48 @@ def main() -> None:
     CLONES_DIR.mkdir(parents=True, exist_ok=True)
 
     pkgs = pd.read_csv(VINTAGE_DIR / "packages.csv")
-    print(f"Extracting dependencies for {len(pkgs)} newborn packages ...")
 
     edges_path = DEPS_DIR / "edges.csv"
     summary_path = DEPS_DIR / "newborn_manifest_summary.csv"
 
-    with open(edges_path, "w", newline="") as ef, open(summary_path, "w", newline="") as sf:
-        ew = csv.writer(ef)
-        ew.writerow(["newborn_repo", "vintage_quarter", "dependency_name"])
-        sw = csv.writer(sf)
-        sw.writerow(["newborn_repo", "vintage_quarter", "n_dependencies", "sources"])
+    # Resumable: newborn_manifest_summary.csv has exactly one row per
+    # processed package (including zero-dependency ones), so it's the
+    # right marker of "already done" -- edges.csv can't be used for that
+    # since a package with 0 deps contributes 0 rows there.
+    done: set[str] = set()
+    if summary_path.exists():
+        done = set(pd.read_csv(summary_path)["newborn_repo"])
+        print(f"Resuming: {len(done)} packages already processed.")
 
-        for i, row in pkgs.iterrows():
+    pending = pkgs[~pkgs["repo_full_name"].isin(done)]
+    print(f"Extracting dependencies for {len(pending)} newborn packages "
+          f"({len(pkgs)} total, {len(done)} already done) ...")
+
+    edges_mode = "a" if edges_path.exists() else "w"
+    summary_mode = "a" if summary_path.exists() else "w"
+
+    with open(edges_path, edges_mode, newline="") as ef, open(summary_path, summary_mode, newline="") as sf:
+        ew = csv.writer(ef)
+        sw = csv.writer(sf)
+        if edges_mode == "w":
+            ew.writerow(["newborn_repo", "vintage_quarter", "dependency_name"])
+        if summary_mode == "w":
+            sw.writerow(["newborn_repo", "vintage_quarter", "n_dependencies", "sources"])
+
+        n_done_this_run = 0
+        for i, row in pending.iterrows():
             names, sources = extract_deps_for_package(
                 row["clone_url"], row["snapshot_sha"], row["repo_full_name"]
             )
             for n in sorted(names):
                 ew.writerow([row["repo_full_name"], row["vintage_quarter"], n])
             sw.writerow([row["repo_full_name"], row["vintage_quarter"], len(names), ";".join(sources)])
-            if (i + 1) % 25 == 0:
-                print(f"  {i + 1}/{len(pkgs)} processed ...")
+            ef.flush()
+            sf.flush()
+            n_done_this_run += 1
+            if n_done_this_run % 25 == 0:
+                print(f"  {n_done_this_run}/{len(pending)} processed this run "
+                      f"({len(done) + n_done_this_run}/{len(pkgs)} total) ...")
 
     print(f"Done. Wrote {edges_path} and {summary_path}")
 

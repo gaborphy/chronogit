@@ -16,25 +16,30 @@
   <div class="container report-container">
 <h1 id="do-newly-created-packages-look-different-depending-on-when-they-were-born">Do newly-created packages look different depending on when they were born?</h1>
 <p>The <a href="REPORT.html">main study</a> tracks the same 10 mature projects across 12
-calendar years. This one asks a different question: pick ~10 new Python
+calendar years. This one asks a different question: pick 30 new Python
 packages born in each quarter since 2014, measure each one's structure at
 the same point in its own lifecycle (~180 days after its first commit),
 and see whether the <em>starting</em> shape of a newly-created package has
 changed across 51 birth-cohorts. Methodology, the discovery/validation
 pipeline, and every caveat are in <a href="README.html#vintage-cohort-study-separate-from-the-above">README.md</a>;
 this document is the findings.</p>
-<p><strong>Sample:</strong> 490 packages across 51 quarters (2014Q1–2026Q3), 9.6/quarter on
-average, from 978 GitHub candidates scanned (358 rejected for not actually
-being a package — no <code>setup.py</code>/<code>pyproject.toml</code>/<code>setup.cfg</code> — and 78 more
-for having a birth-quarter that didn't match their real git history; see
-README for both).</p>
+<p><strong>Sample:</strong> 1,530 packages across 51 quarters (2014Q1–2026Q3), a clean 30
+every quarter (no shortfalls at any point in this run — a wider discovery
+net than the original 10/quarter pass), from 3,220 GitHub candidates
+scanned (1,348 rejected for not actually being a package — no
+<code>setup.py</code>/<code>pyproject.toml</code>/<code>setup.cfg</code> — and 211 more for having a
+birth-quarter that didn't match their real git history; see README for
+both).</p>
 <p><strong>This is a fundamentally noisier, more confounded dataset than the main
-study</strong>, and the two shouldn't be read with equal confidence: 7–10
-packages per point instead of a fixed panel of 10 tracked for 12 years
-each, selected by a popularity signal (GitHub stars) whose baseline
+study</strong>, and the two shouldn't be read with equal confidence: even at 30
+packages per point this is nowhere near a fixed panel of 10 tracked for 12
+years each, selected by a popularity signal (GitHub stars) whose baseline
 shifted enormously as GitHub itself grew across the same window. Every
 finding below is stated with that caveat attached, not as a footnote at
-the end.</p>
+the end. (An earlier pass at 10 packages/quarter found the same
+directions on every metric below, generally at somewhat larger magnitudes
+— the 3x-larger sample here moderates several of the more extreme ratios
+toward more trustworthy values without changing any conclusion.)</p>
 <hr />
 <h2 id="headline-newly-created-packages-start-out-much-bigger-and-more-complex-now-than-in-20142015">Headline: newly-created packages start out much bigger and more complex now than in 2014–2015</h2>
 <p>Comparing the median of the first 8 cohort-quarters (2014Q1–2015Q4) to the
@@ -51,47 +56,48 @@ median of the last 8 (2024Q4–2026Q2):</p>
 <tbody>
 <tr>
 <td>mean function length (lines)</td>
-<td style="text-align: right;">11.1</td>
-<td style="text-align: right;">26.4</td>
-<td style="text-align: right;"><strong>+137%</strong></td>
+<td style="text-align: right;">12.2</td>
+<td style="text-align: right;">24.9</td>
+<td style="text-align: right;"><strong>+103%</strong></td>
 </tr>
 <tr>
 <td>mean function body length (excl. docstring)</td>
-<td style="text-align: right;">10.0</td>
-<td style="text-align: right;">23.6</td>
-<td style="text-align: right;"><strong>+136%</strong></td>
+<td style="text-align: right;">9.9</td>
+<td style="text-align: right;">21.8</td>
+<td style="text-align: right;"><strong>+120%</strong></td>
 </tr>
 <tr>
 <td>mean McCabe complexity</td>
-<td style="text-align: right;">2.67</td>
-<td style="text-align: right;">4.61</td>
-<td style="text-align: right;"><strong>+73%</strong></td>
+<td style="text-align: right;">2.59</td>
+<td style="text-align: right;">4.37</td>
+<td style="text-align: right;"><strong>+69%</strong></td>
 </tr>
 <tr>
 <td>median McCabe complexity</td>
 <td style="text-align: right;">2.0</td>
-<td style="text-align: right;">3.0</td>
-<td style="text-align: right;">+50%</td>
+<td style="text-align: right;">2.5</td>
+<td style="text-align: right;">+25%</td>
 </tr>
 <tr>
 <td>fraction of functions with a docstring</td>
-<td style="text-align: right;">27%</td>
-<td style="text-align: right;">56%</td>
-<td style="text-align: right;"><strong>+103%</strong></td>
+<td style="text-align: right;">31%</td>
+<td style="text-align: right;">50%</td>
+<td style="text-align: right;"><strong>+60%</strong></td>
 </tr>
 <tr>
 <td>mean comment length (chars)</td>
-<td style="text-align: right;">41.5</td>
-<td style="text-align: right;">42.8</td>
-<td style="text-align: right;">+3%</td>
+<td style="text-align: right;">41.3</td>
+<td style="text-align: right;">42.7</td>
+<td style="text-align: right;">+4%</td>
 </tr>
 </tbody>
 </table>
 <p><img class="img-fluid rounded border my-3" alt="Family 3: function length by vintage" src="../../repo-metrics/output/vintage/charts/vintage_family3_function_length.png" /></p>
 <p><img class="img-fluid rounded border my-3" alt="Family 2: complexity by vintage" src="../../repo-metrics/output/vintage/charts/vintage_family2_complexity.png" /></p>
-<p>The magnitude here dwarfs the equivalent numbers from the calendar-time
-study, where the <em>same 10 mature repos</em>, tracked over the <em>same 12 years</em>,
-showed function length +25%, body length +17%, complexity +4.7%. Put the
+<p>The magnitude here still dwarfs the equivalent numbers from the
+calendar-time study, where the <em>same 10 mature repos</em>, tracked over the
+<em>same 12 years</em>, showed function length +25%, body length +17%,
+complexity +4.7%. Put the
 two side by side and a pattern emerges: <strong>existing, mature projects have
 drifted only modestly toward longer/more-complex functions, but the
 population of newly-started packages has shifted much more sharply.</strong>
@@ -101,11 +107,12 @@ than in how an established codebase evolves.</p>
 <h2 id="docstring-rate-flat-for-a-decade-then-a-sharp-acceleration-in-20242025">Docstring rate: flat for a decade, then a sharp acceleration in 2024–2025</h2>
 <p><img class="img-fluid rounded border my-3" alt="Docstrings and contributors by vintage" src="../../repo-metrics/output/vintage/charts/vintage_docstring_and_contributors.png" /></p>
 <p>The fraction of functions carrying a docstring bounces noisily between
-roughly 0.10 and 0.40 for every cohort from 2014Q1 through 2024Q3 — no
-trend, just quarter-to-quarter sampling noise from a 10-package cohort.
-Then: 2024Q4 = 0.56, 2025Q1 = 0.56, 2025Q2 = 0.61, 2025Q4 = 0.84 (the
-single highest point in the whole series), before settling back to
-0.35–0.56 in the first three quarters of 2026. That's a distinct
+roughly 0.13 and 0.39 for every cohort from 2014Q1 through 2024Q3 — no
+trend, just quarter-to-quarter sampling noise, now measured against a
+30-package cohort rather than 10 and still showing no pattern. Then:
+2024Q4 = 0.52, 2025Q1 = 0.50, 2025Q2 = 0.62, 2025Q4 = 0.64 (the single
+highest point in the whole series), before settling back to 0.40–0.49 in
+the first three quarters of 2026. That's a distinct
 step, not a continuation of the prior noise band, and it lands squarely
 in the window where AI coding assistants (GitHub Copilot, ChatGPT-based
 tools) went from novelty to mainstream. <strong>This is consistent with — but
@@ -133,10 +140,15 @@ strongest single piece of evidence in this whole exercise.</p>
 <p>Log-scaled because individual packages are wildly outlier-prone here — a
 180-day-old package can easily have had only a dozen commits, so one bulk
 scaffold/vendoring commit dominates its own median. Reading the median
-line (not the scattered dots): added-lines-per-hunk sits in a tight 2.5–4
-band from 2014 through roughly 2023, then climbs to 5–7 across
-2024–2026. Added-lines-per-commit is noisier throughout (typically 4–10,
-occasional spikes) with a similar late-window rise. Unlike the
+line (not the scattered dots): added-lines-per-hunk sits in a tight
+2.0–2.9 band from 2014 all the way through 2025Q2 — over a decade with no
+real movement — then climbs sharply to 4.1–6.6 across 2025Q3–2026Q3, its
+most recent five quarters. Added-lines-per-commit follows the same shape,
+more noisily: roughly 6–14 for most of the series, then 16–28 in the same
+2025Q3–2026Q3 window. With the larger sample this reads as a real,
+recent, and specifically-timed shift rather than the vaguer "somewhere in
+2024–2026" read from the smaller pass — whatever is behind it appears to
+have kicked in around mid-2025. Unlike the
 calendar-time study — where hunk size for <em>mature</em> repos was essentially
 perfectly flat over 12 years — new packages' initial commits do appear to
 be getting chunkier recently. Given the small-N noise here, treat this as
@@ -144,8 +156,8 @@ directional, not precise.</p>
 <h2 id="what-not-to-read-into-this-data">What NOT to read into this data</h2>
 <p><strong>Contributor count and commit count in the first 180 days are the
 weakest signals in this study and are presented for completeness, not as
-a finding.</strong> Median contributors-in-first-180-days went from 4 (2014–2015
-cohorts) to 18.75 (2024–2026 cohorts), a +369% change — but this sample
+a finding.</strong> Median contributors-in-first-180-days went from 3.75
+(2014–2015 cohorts) to 13.25 (2024–2026 cohorts), a +253% change — but this sample
 selects the <em>most-starred</em> packages born each quarter, and GitHub's own
 user base grew roughly 20-fold across this window. A "top-10-by-stars"
 package born in 2025 is being drawn from an audience of ~100M+ developers;
@@ -168,20 +180,27 @@ to some degree; this study cannot apportion the split.</p>
 <hr />
 <h2 id="sample-health">Sample health</h2>
 <p><img class="img-fluid rounded border my-3" alt="Sample health" src="../../repo-metrics/output/vintage/charts/vintage_sample_health.png" /></p>
-<p>9 of 51 quarters landed short of the 10-package target (7–9 found instead)
-after exhausting all 25 discovered candidates — mostly quarters with an
-unusually high share of non-package results (awesome-lists, tutorial
-repos) among the top-25 by stars. <code>state_parse_rate</code> starts a little
-below 1.0 in 2014–2015 (median ~0.83–0.95 in the earliest cohorts, versus
-1.00 from 2017 onward) — the same Python-2-tail effect as the
-calendar-time study, just measured on freshly-founded-in-2014 packages
-rather than on old files still living inside a 2026 mature codebase.</p>
+<p>Every one of the 51 quarters hit its full 30-package target — a wider
+discovery net (up to 100 candidates per quarter instead of 25) gave
+enough headroom that no quarter ran out of viable candidates this time.</p>
+<p><code>state_parse_rate</code>'s <em>median</em> is 1.0 in essentially every quarter,
+including 2014 — at 30 packages per cohort, a clean majority are already
+fully Python-3-parseable and the median saturates. The <em>mean</em> tells the
+real story: it dips to 0.87–0.98 across 2014–2016 before settling at
+~0.97–1.00 from 2017 onward, because roughly a third of 2014–2016 cohort
+packages (118 of 360, checked directly against the raw per-package data)
+carry at least one Python-2-only file even though most of their
+codebase parses cleanly. Same Python-2-tail effect as the calendar-time
+study, just measured on freshly-founded packages rather than on old files
+still living inside a 2026 mature codebase — and only visible with the
+mean, not the median, once the cohort is large enough for the median to
+be dominated by the (parseable) majority.</p>
 <h2 id="data-reproducing-this">Data &amp; reproducing this</h2>
 <ul>
-<li>Discovered candidates (25/quarter, before package validation):
+<li>Discovered candidates (up to 100/quarter, before package validation):
   <code>output/vintage/candidates.json</code></li>
 <li>One row per successfully-measured package: <code>output/vintage/packages.csv</code></li>
-<li>Per-repo/candidate outcome log (why each of the 978 scanned candidates
+<li>Per-repo/candidate outcome log (why each of the 3,220 scanned candidates
   succeeded or was rejected): <code>output/vintage/progress.json</code></li>
 <li>Cohort-quarter aggregates (median/mean/p25/p75 across each quarter's
   packages): <code>output/vintage/analysis/vintage_quarterly.csv</code></li>

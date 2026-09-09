@@ -14,7 +14,7 @@ correction).
 
 ## Method
 
-Reuses the 490 packages from the [vintage-cohort study](VINTAGE_REPORT.md) as
+Reuses the 1,530 packages from the [vintage-cohort study](VINTAGE_REPORT.md) as
 "newborn packages": for each one, its declared dependencies were parsed
 directly from the manifest at the exact same git snapshot already used to
 measure its code structure (`pyproject.toml`'s `[project.dependencies]` /
@@ -39,12 +39,12 @@ applied here (ecosyste.ms's own limit is 5,000 requests/window).
 count of everyone who ever committed, not a recent/active-contributor
 count.
 
-**Coverage:** 373 of 490 newborn packages (76%) had at least one
-extractable dependency (117 had none — some legitimately ship with zero
+**Coverage:** 1,156 of 1,530 newborn packages (76%) had at least one
+extractable dependency (374 had none — some legitimately ship with zero
 external dependencies this early, some declare dependencies dynamically
 in a way that can't be read without executing `setup.py`, which this
-deliberately never does). That yielded 5,231 (newborn → dependency) edges
-across 1,609 unique dependency names, of which 1,605 (99.8%) resolved to
+deliberately never does). That yielded 14,832 (newborn → dependency) edges
+across 3,025 unique dependency names, of which 2,988 (98.8%) resolved to
 a real PyPI package on ecosyste.ms. All 400 baseline packages resolved.
 
 ## Result: the dependency set is a massively more popular slice of PyPI than chance
@@ -53,23 +53,26 @@ a real PyPI package on ecosyste.ms. All 400 baseline packages resolved.
 
 | metric | dependency-set median | baseline median | ratio | Mann-Whitney p | P(random dependency > random baseline) |
 |---|---:|---:|---:|---:|---:|
-| stars | 1,191 | 2 | **596×** | 1.4×10⁻⁹⁵ | 93.2% |
-| forks | 196 | 0 | — (baseline median is 0) | 2.3×10⁻⁹¹ | 92.2% |
-| lifetime contributors | 47 | 13 | 3.6× | 5.9×10⁻⁶ | 70.1% |
+| stars | 813 | 3 | **271×** | 2.4×10⁻⁸⁴ | 89.9% |
+| forks | 119 | 1 | **119×** | 1.1×10⁻⁷⁴ | 87.4% |
+| lifetime contributors | 36 | 11 | 3.3× | 3.4×10⁻⁵ | 66.9% |
 
 The last column is the common-language effect size: pick one package used
 as a dependency and one random baseline package — that's the probability
-the dependency one has the higher value. For stars and forks that's over
-90%, about as clean a separation as this kind of ecosystem data ever
-produces. **85.5% of a typical random PyPI package has 10 stars or
-fewer** — that's the modal case for "a package on PyPI," not an edge case
-— while only 7.7% of used-dependencies fall in that bin; 14.2% of
-dependencies have 10,000+ stars against 0.75% of random packages.
+the dependency one has the higher value. For stars and forks that's still
+around 90%, about as clean a separation as this kind of ecosystem data
+ever produces, and the underlying medians are more trustworthy now that
+the baseline sample (still the same 400 random PyPI packages, unaffected
+by scaling the newborn side) is being compared against 3x the
+dependency-set data. **81% of a typical random PyPI package has 10 stars
+or fewer** — that's the modal case for "a package on PyPI," not an edge
+case — while only 10.0% of used-dependencies fall in that bin; 10.3% of
+dependencies have 10,000+ stars against 0.5% of random packages.
 
 ![Survival curves](output/deps/charts/ecdf_comparison.png)
 
-Contributors is the same direction but visibly weaker — 70% is a real,
-statistically solid effect (p = 5.9×10⁻⁶), not noise, but nowhere near the
+Contributors is the same direction but visibly weaker — 67% is a real,
+statistically solid effect (p = 3.4×10⁻⁵), not noise, but nowhere near the
 stars/forks separation. A plausible reading: stars and forks are largely
 driven by *visibility* (how many people have seen and reacted to the
 repo), which is exactly the kind of signal that would drive independent
@@ -83,11 +86,11 @@ noisier proxy for "would a newcomer pick this."
 ![Fan-in vs popularity](output/deps/charts/fan_in_vs_popularity.png)
 
 Restricting to only the packages that *are* used as a dependency, does
-being used by *more* of the 490 newborns (higher "fan-in") track with
-being *more* popular? Yes, but only moderately: Spearman ρ = 0.32 for
-stars, 0.31 for forks, 0.27 for contributors (all p < 10⁻²², so the
+being used by *more* of the 1,530 newborns (higher "fan-in") track with
+being *more* popular? Yes, but only moderately: Spearman ρ = 0.34 for
+stars, 0.34 for forks, 0.30 for contributors (all p < 10⁻⁴⁵, so the
 relationship is certainly real, just not tight). The scatter plot shows
-why: packages used by only 1 of the 490 newborns span the *entire* star
+why: packages used by only 1 of the 1,530 newborns span the *entire* star
 range, from single digits to 100,000+ — a highly-starred package can
 still be a niche dependency picked up by just one or two of this specific
 sample. But high fan-in (10+ newborns depending on it) essentially never
@@ -98,35 +101,38 @@ many different projects' domains, which star count alone doesn't capture.
 
 ## The 20 most-depended-on packages in this sample
 
-| package | used by (of 490) | stars | forks | lifetime contributors |
+| package | used by (of 1,530) | stars | forks | lifetime contributors |
 |---|---:|---:|---:|---:|
-| numpy | 146 | 32,629 | 12,691 | 1,838 |
-| requests | 139 | 54,279 | 10,119 | 742 |
-| tqdm | 86 | 31,300 | 1,489 | 120 |
-| torch | 83 | 102,657 | 29,031 | 5,024 |
-| pyyaml | 72 | 2,941 | 601 | 42 |
-| pillow | 72 | 12,226 | 2,226 | 491 |
-| pandas | 62 | 43,640 | 17,915 | 3,550 |
-| pydantic | 61 | 28,734 | 2,931 | 597 |
-| openai | 56 | 31,557 | 5,173 | 115 |
-| six | 51 | 1,028 | 276 | 67 |
-| scipy | 48 | 14,990 | 5,909 | 1,667 |
-| python-dotenv | 44 | 8,868 | 571 | 102 |
-| matplotlib | 42 | 23,145 | 8,468 | 1,730 |
-| transformers | 42 | 164,705 | 34,419 | 2,816 |
-| uvicorn | 41 | 10,939 | 1,022 | 198 |
-| click | 40 | 15,104 | 1,381 | 373 |
-| httpx | 39 | 15,459 | 1,270 | 241 |
-| pytest | 39 | 11,329 | 2,494 | 977 |
-| tiktoken | 37 | 19,120 | 1,604 | 19 |
-| jinja2 | 37 | 11,766 | 1,820 | 310 |
+| numpy | 422 | 32,629 | 12,691 | 1,838 |
+| requests | 364 | 54,279 | 10,119 | 742 |
+| torch | 242 | 102,657 | 29,031 | 5,024 |
+| tqdm | 230 | 31,306 | 1,500 | 120 |
+| pyyaml | 203 | 2,941 | 601 | 42 |
+| pillow | 200 | 12,226 | 2,226 | 491 |
+| pandas | 174 | 43,640 | 17,915 | 3,550 |
+| scipy | 163 | 14,990 | 5,909 | 1,667 |
+| pydantic | 160 | 28,734 | 2,931 | 597 |
+| transformers | 147 | 164,705 | 34,419 | 2,816 |
+| openai | 138 | 31,557 | 5,173 | 115 |
+| matplotlib | 133 | 23,145 | 8,468 | 1,730 |
+| click | 126 | 15,104 | 1,381 | 373 |
+| six | 124 | 1,029 | 276 | 67 |
+| uvicorn | 114 | 10,939 | 1,022 | 198 |
+| fastapi | 109 | 102,037 | 9,837 | 764 |
+| python-dotenv | 109 | 8,868 | 571 | 102 |
+| rich | 106 | 57,318 | 2,329 | 268 |
+| pytest | 98 | 11,329 | 2,494 | 977 |
+| torchvision | 97 | 16,162 | 6,946 | 585 |
 
 Full table: `output/deps/analysis/top20_most_depended_on.csv`. Note
 `pyyaml` and `six` sit near the bottom of this list's star counts (2,941
-and 1,028) yet rank in the top 10 by fan-in — both are exactly the
+and 1,029) yet rank in the top 10 by fan-in — both are exactly the
 "generically useful, low-glamour utility" case the fan-in-vs-popularity
 finding above predicts: broadly adopted despite modest visibility,
-because nearly every project needs them.
+because nearly every project needs them. `fastapi` and `rich` are new
+entrants at 3x scale (both weren't in the original 10/quarter top-20) —
+consistent with a larger sample surfacing more of the genuinely broad,
+not just the loudest, common dependencies.
 
 ## Is the popularity effect increasing over time?
 
@@ -148,45 +154,50 @@ two separate questions, and they get different answers:
 The direct way to test "are cohorts repeating the same names more" is to
 look at unique dependency names as a share of that cohort's total edges,
 or a Herfindahl-Hirschman Index (HHI) of how concentrated each cohort's
-edges are across names. Both *look* like they're rising: unique-names-per-edge
-drops from 0.80 (2014) to 0.54 (2026) (Spearman ρ=-0.86, p=0.0002), and
-HHI roughly doubles.
+edges are across names. Both *look* like they're rising, and the naive
+signal only got stronger with 3x the data: unique-names-per-edge drops
+from 0.59 (2014) to 0.36 (2026) (Spearman ρ=-0.98, p=7.8×10⁻⁹ by year),
+and HHI is noisier but trends the same direction.
 
 **This is a sample-size artifact, not a behavioral change.** Edge volume
-grew 3–4× over the same window (294 edges in 2014 → 832 in 2023) simply
-because the corpus has more packages and each has more resolved
-dependencies in later cohorts — and drawing more names from any fixed
-pool mechanically produces more repeat collisions on already-seen names,
-shrinking the unique-ratio, with zero change in the underlying selection
-process required. The standard ecological fix is rarefaction: repeatedly
-subsample the *same* number of edges (140, picked below the smallest
-cohort's 143) from every year and compare the average number of distinct
-names recovered — an apples-to-apples diversity comparison that doesn't
-care how much total data a year happened to produce. Rarefied diversity
-is **flat across all 13 years** (Spearman ρ=-0.01, p=0.99) — no trend at
-all, well within year-to-year noise. Once sample size is controlled for,
-**there is no evidence that newborn packages are converging on a smaller
-set of dependencies now than they were in 2014.** The naive numbers were
-real, but they were measuring corpus growth, not choice behavior.
+grew roughly 5× at its peak over the window (557 edges in 2014 → 2,818 in
+2024) simply because the corpus has more packages and each has more
+resolved dependencies in later cohorts — and drawing more names from any
+fixed pool mechanically produces more repeat collisions on already-seen
+names, shrinking the unique-ratio, with zero change in the underlying
+selection process required. The standard ecological fix is rarefaction:
+repeatedly subsample the *same* number of edges (400, picked just below
+the smallest cohort's 404) from every year and compare the average number
+of distinct names recovered — an apples-to-apples diversity comparison
+that doesn't care how much total data a year happened to produce.
+Rarefied diversity is **flat across all 13 years** (Spearman ρ=0.08,
+p=0.80) — no trend at all, well within year-to-year noise, and if
+anything the point estimate now leans slightly *positive* rather than
+negative. Once sample size is controlled for, **there is no evidence that
+newborn packages are converging on a smaller set of dependencies now than
+they were in 2014.** The naive numbers were real, but they were measuring
+corpus growth, not choice behavior — and this null result got *more*
+convincing, not less, with 3x the underlying data.
 
 A second, independent check points the same way: `share_edges_to_global_top20`
 — what fraction of each cohort's edges land on one of the all-time
 top-20 most-depended-on packages from the table above — has **no trend**
-either (p=0.48 by year, p=0.90 by quarter), bouncing between 0.13 and
-0.33 with no direction. Recent cohorts aren't leaning on *the same*
+either (p=0.79 by year, p=0.99 by quarter), bouncing between 0.16 and
+0.32 with no direction. Recent cohorts aren't leaning on *the same*
 famous packages any more than early cohorts did.
 
 ### Popularity: rising for stars and forks, flat for contributors
 
 ![Popularity of chosen dependencies over time](output/deps/charts_time/popularity_over_time.png)
 
-Median stars of a cohort's chosen dependencies rose from 2,206 (2014) to
-5,715 (2026) — noisy (one year, 2020, is a clear outlier at 11,259) but a
-real trend (Spearman ρ=0.77, p=0.002 by year; ρ=0.45, p=0.0008 by
-quarter). Median forks moves the same direction, more weakly (ρ=0.53,
-p=0.06 — suggestive, not clean). **Median lifetime contributor count of
-chosen dependencies shows no trend at all** (ρ=-0.18, p=0.55) — flat
-across the entire window. This is the same pattern as the main
+Median stars of a cohort's chosen dependencies rose from 2,848 (2014) to
+8,868 (2026) — noisy quarter to quarter but a real, now more convincing
+trend with 3x the data (Spearman ρ=0.81, p=0.0008 by year; ρ=0.57,
+p=1.6×10⁻⁵ by quarter). Median forks moves the same direction, still
+weaker (ρ=0.51, p=0.07 by year — suggestive, not clean). **Median
+lifetime contributor count of chosen dependencies shows no trend at all**
+(ρ=-0.48, p=0.10 by year) — flat across the entire window, and if
+anything drifting slightly down (122 in 2014 vs. 120 in 2026). This is the same pattern as the main
 case-control result above: stars and forks move together and respond to
 whatever is driving this, contributor count doesn't, consistent with
 stars/forks being more of a visibility signal and contributor count
@@ -214,22 +225,23 @@ Edges to a curated list of LLM/genAI SDK packages (`openai`, `anthropic`,
 `transformers`, `langchain*`, `tiktoken`, `huggingface-hub`, and similar —
 deliberately excluding generic ML frameworks like `torch` that predate
 and extend well beyond the recent LLM wave) go from essentially zero
-before 2022 to 5–11% of all dependency edges in 2023–2026, tracking the
+before 2022 to 5–10% of all dependency edges in 2022–2026, tracking the
 November 2022 ChatGPT release almost exactly. That part of the
 hypothesis — newborn packages increasingly building on AI/LLM tooling —
 is unambiguously true in this data.
 
 What it does **not** do is explain away the concentration finding, because
 there's nothing to explain away: re-running both the naive and rarefied
-concentration tests with all AI/genAI SDK edges excluded barely moves
-either number (unique-ratio trend: ρ=-0.76, p=0.002, vs. ρ=-0.86 with
-them included — the naive "decline" persists without AI packages, exactly
-as sample-size math predicts it should, since removing 294 of 5,231 edges
-barely changes cohort sizes). This was checked specifically to rule out
-"concentration looks like it's rising only because more recent packages
-are themselves AI wrappers sharing 2–3 SDK imports" — that's not what's
-happening; there's no real concentration trend to begin with, with or
-without the AI packages in the picture.
+concentration tests with all 776 AI/genAI SDK edges (of 14,832 total)
+excluded leaves the trend statistically identical — Spearman ρ=-0.978,
+p=7.8×10⁻⁹ either way, since it's a rank-based test and removing a
+roughly proportionate share of edges from every year doesn't reorder the
+years — with only the raw last-year value nudging slightly (0.360 with
+AI edges included vs. 0.382 without). This was checked specifically to
+rule out "concentration looks like it's rising only because more recent
+packages are themselves AI wrappers sharing 2–3 SDK imports" — that's not
+what's happening; there's no real concentration trend to begin with, with
+or without the AI packages in the picture.
 
 ### Verdict on the hypothesis
 
@@ -251,8 +263,8 @@ by a human or a coding assistant; an AI/genAI SDK dependency is a *topic*
 signal (what a package is about), not a *usage* signal (how it was
 written). **[AI_USAGE_REPORT.md](AI_USAGE_REPORT.md) measures the latter
 directly** — commit trailers and config files that self-disclose an AI
-coding tool, read from the same 490 packages' git history — and finds
-self-disclosed AI-tool usage climbing from ~0% (pre-2022) to 89% of the
+coding tool, read from the same 1,530 packages' git history — and finds
+self-disclosed AI-tool usage climbing from ~0% (pre-2022) to 73% of the
 (partial) 2026 cohort, overtaking AI-SDK topic dependence as the dominant
 signal by 2025. It's a floor, not a full measurement (most AI-assisted
 commits leave no trace at all), but it's direct evidence rather than an
@@ -260,7 +272,7 @@ inference from what a package imports.
 
 ## Caveats
 
-- **This sample is itself star-ranked at the source.** The 490 newborn
+- **This sample is itself star-ranked at the source.** The 1,530 newborn
   packages were discovered by GitHub search sorted by stars (see the
   vintage study). A newborn package that's already popular may be more
   likely to declare fashionable, also-popular dependencies (a
@@ -272,9 +284,9 @@ inference from what a package imports.
 - **`total_committers` is a lifetime count**, not weighted by recency —
   an old, large, but now-quiet project can out-rank an actively-growing
   one on this metric alone.
-- **The AI/LLM tooling skew in the top-20 list** (`openai`, `transformers`,
-  `tiktoken`) reflects when these 490 packages were sampled and searched
-  for (2014–2026, weighted toward however GitHub's own growth distributes
+- **The AI/LLM tooling skew in the top-20 list** (`openai`, `transformers`)
+  reflects when these 1,530 packages were sampled and searched for
+  (2014–2026, weighted toward however GitHub's own growth distributes
   across that window — see the vintage study's caveat on this) more than
   it reflects the general PyPI ecosystem.
 - **The baseline is popularity-blind, not usage-blind** — it's a random

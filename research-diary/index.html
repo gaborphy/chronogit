@@ -22,11 +22,11 @@
           <time datetime="2026-09-09T09:55:43+02:00">September 9, 2026</time>
         </div>
         <h2 class="card-title h4">Is AI actually writing these packages, not just being depended on?</h2>
-        <p class="abstract">A genuinely different signal from the earlier AI/genAI-SDK-dependency proxy: read the same 490 vintage-cohort packages&#x27; own git history for direct, self-disclosed evidence of AI-tool authorship -- commit trailers like &quot;Co-Authored-By: Claude&quot; and AI-tool config files (CLAUDE.md, .cursorrules, AGENTS.md, ...) present at each package&#x27;s snapshot. Strong-signal, low-recall by design: a positive is solid evidence, a negative proves nothing, so every number here is a floor on true usage.</p>
+        <p class="abstract">A genuinely different signal from the earlier AI/genAI-SDK-dependency proxy: read the same 1,530 vintage-cohort packages&#x27; own git history for direct, self-disclosed evidence of AI-tool authorship -- commit trailers like &quot;Co-Authored-By: Claude&quot; and AI-tool config files (CLAUDE.md, .cursorrules, AGENTS.md, ...) present at each package&#x27;s snapshot. Strong-signal, low-recall by design: a positive is solid evidence, a negative proves nothing, so every number here is a floor on true usage.</p>
         <ul class="key-results">
-          <li>Self-disclosed AI-tool usage went from ~0% of newborn packages through 2021 to 89% of the (partial) 2026 cohort -- 7.9% (2022), 5.0% (2023), 15.0% (2024), 50.0% (2025), 88.9% (2026 Q1-Q3) -- a strong, significant trend (Spearman p=0.003).</li>
-          <li>This overtook AI-SDK topic dependence as the dominant &quot;AI-relatedness&quot; signal by 2025: the two moved together through 2022-2024 (~5-15%), then AI-SDK share plateaued around 8-10% while self-disclosed usage kept climbing to 50% then 89%.</li>
-          <li>Confirmed broad-based, not a self-referential niche: 78% of AI-signal-positive packages have no &quot;claude/copilot/cursor/skill/agent&quot; in their own name, and the same rising pattern holds within just that non-meta subset.</li>
+          <li>Self-disclosed AI-tool usage went from ~0% of newborn packages through 2021 to 73% of the (partial) 2026 cohort -- 2.5% (2022), 2.5% (2023), 9.2% (2024), 51.7% (2025), 73.3% (2026 Q1-Q3) -- a strong, significant trend (Spearman p=0.002).</li>
+          <li>This overtook AI-SDK topic dependence as the dominant &quot;AI-relatedness&quot; signal by 2025: the two moved together through 2022-2024 (~2-10%), then AI-SDK share plateaued around 8-9% while self-disclosed usage kept climbing to 52% then 73%.</li>
+          <li>Confirmed broad-based, not a self-referential niche: 83% of AI-signal-positive packages have no &quot;claude/copilot/cursor/skill/agent&quot; in their own name, and the same rising pattern holds within just that non-meta subset -- an even cleaner result than the original 10/quarter pass.</li>
         </ul>
         <div class="link-row">
           <a href="reports/AI_USAGE_REPORT.html" class="btn btn-sm btn-outline-primary">Full report</a>
@@ -45,7 +45,11 @@ inline-autocomplete mode leaves no trace by default and is almost
 certainly undercounted relative to Claude and Cursor here. Also worth a
 look: <code>Graphify-Labs/graphify</code> (51.3% AI-attributed commits) is the same
 repo flagged in the vintage-cohort study for star counts implausible for
-its age -- a heavily-AI-agent-driven project, a bot-inflated one, or both.</p>
+its age -- a heavily-AI-agent-driven project, a bot-inflated one, or both.
+At 3x the sample, even more extreme cases turned up: <code>2akouwu/reverify</code>
+(85.5%) and <code>ShenSeanChen/waku-agent</code> (84.3%), plus
+<code>anthropics/claude-agent-sdk-python</code> (40.6%) -- Anthropic&#x27;s own
+Claude-agent SDK, itself substantially built with Claude.</p>
         </details>
       </div>
     </article>
@@ -56,11 +60,11 @@ its age -- a heavily-AI-agent-driven project, a bot-inflated one, or both.</p>
           <time datetime="2026-09-09T07:59:38+02:00">September 9, 2026</time>
         </div>
         <h2 class="card-title h4">Are popular packages more likely to end up in a newborn package&#x27;s dependency list?</h2>
-        <p class="abstract">Tested this as a case-control comparison, not just a description: parsed declared dependencies for the 490 vintage-cohort newborn packages (373 had at least one, 5,231 edges to 1,609 unique packages) and compared their popularity against a popularity-blind random sample of 400 PyPI packages.</p>
+        <p class="abstract">Tested this as a case-control comparison, not just a description: parsed declared dependencies for the 1,530 vintage-cohort newborn packages (1,156 had at least one, 14,832 edges to 3,025 unique packages) and compared their popularity against a popularity-blind random sample of 400 PyPI packages.</p>
         <ul class="key-results">
-          <li>Decisive for stars and forks: dependency-set median is 1,191 stars vs 2 for a random package (596x, Mann-Whitney p=1.4e-95) -- a random used-dependency beats a random baseline package on stars 93% of the time.</li>
-          <li>Real but much weaker for lifetime contributors (3.6x, p=5.9e-6, 70% effect size) -- plausibly because contributor count also reflects project age/size, not just visibility.</li>
-          <li>Within the dependency set, being depended on by more of the 490 newborns correlates only moderately with popularity (Spearman ~0.3) -- popularity looks close to necessary for broad adoption but isn&#x27;t sufficient (pyyaml, six rank top-10 by fan-in despite modest star counts).</li>
+          <li>Decisive for stars and forks: dependency-set median is 813 stars vs 3 for a random package (271x, Mann-Whitney p=2.4e-84) -- a random used-dependency beats a random baseline package on stars 90% of the time.</li>
+          <li>Real but much weaker for lifetime contributors (3.3x, p=3.4e-5, 67% effect size) -- plausibly because contributor count also reflects project age/size, not just visibility.</li>
+          <li>Within the dependency set, being depended on by more of the 1,530 newborns correlates only moderately with popularity (Spearman ~0.34) -- popularity looks close to necessary for broad adoption but isn&#x27;t sufficient (pyyaml, six rank top-10 by fan-in despite modest star counts). A later follow-up (see the time-dimension work in the full report) found no evidence this concentration effect is actually increasing over cohort years -- a naive signal that didn&#x27;t survive a sample-size correction.</li>
         </ul>
         <div class="link-row">
           <a href="reports/DEPENDENCY_REPORT.html" class="btn btn-sm btn-outline-primary">Full report</a>
@@ -69,7 +73,7 @@ its age -- a heavily-AI-agent-driven project, a bot-inflated one, or both.</p>
         </div>
         <details class="notes">
           <summary>More notes</summary>
-          <p>Caveat carried over directly from the report: the 490-package sample is
+          <p>Caveat carried over directly from the report: the 1,530-package sample is
 itself star-ranked at the source (see the vintage-cohort post), so this
 can&#x27;t cleanly separate &quot;popular packages get chosen because they&#x27;re
 popular&quot; from &quot;trendy new packages and trendy dependencies both move
@@ -88,11 +92,11 @@ project, no code execution involved.</p>
           <time datetime="2026-09-08T23:15:01+02:00">September 8, 2026</time>
         </div>
         <h2 class="card-title h4">Do newly-created packages look different depending on when they were born?</h2>
-        <p class="abstract">Sampled ~10 new Python packages per birth quarter from GitHub search, 2014Q1-2026Q3 (490 packages, 96% fill rate), and measured each one once at ~180 days old so different eras are compared at the same point in a package&#x27;s life, not the same calendar date.</p>
+        <p class="abstract">Sampled 30 new Python packages per birth quarter from GitHub search, 2014Q1-2026Q3 (1,530 packages -- rescaled up from an original 10/quarter, 490-package pass, every quarter now hitting its full target with no shortfalls), and measured each one once at ~180 days old so different eras are compared at the same point in a package&#x27;s life, not the same calendar date.</p>
         <ul class="key-results">
-          <li>Function length and complexity grew far more for newly-founded packages (+137% / +73%, 2014-15 vs 2024-26 cohorts) than for the mature, tracked-over-time repos in the calendar-time study (+25% / +4.7%) -- most of the &quot;code got bigger&quot; signal is in what gets founded now, not in how existing projects evolved.</li>
+          <li>Function length and complexity grew far more for newly-founded packages (+103% / +69%, 2014-15 vs 2024-26 cohorts) than for the mature, tracked-over-time repos in the calendar-time study (+25% / +4.7%) -- most of the &quot;code got bigger&quot; signal is in what gets founded now, not in how existing projects evolved. (Same direction as the original 10/quarter pass, at more trustworthy, less extreme magnitudes.)</li>
           <li>Comment length stayed flat here too, independently confirming the calendar-time study&#x27;s strongest result.</li>
-          <li>Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven.</li>
+          <li>Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven. Added-lines-per-hunk tells a similarly precise story at this larger scale: flat for over a decade (2014-2025Q2), then a sharp climb starting specifically 2025Q3.</li>
         </ul>
         <div class="link-row">
           <a href="reports/VINTAGE_REPORT.html" class="btn btn-sm btn-outline-primary">Full report</a>

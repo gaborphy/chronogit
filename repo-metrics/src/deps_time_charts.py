@@ -31,8 +31,12 @@ def _trend_line(ax, x, y, color, label=None):
 
 
 def chart_concentration_naive_vs_rarefied() -> None:
+    from scipy import stats as _stats
+
     by_y = pd.read_csv(TIME_DIR / "by_year_all.csv")
     raref = pd.read_csv(TIME_DIR / "rarefied_diversity_by_year.csv")
+    n_draw = int(raref["n_draw"].iloc[0])
+    rho, p = _stats.spearmanr(raref["year"], raref["rarefied_unique_at_n"])
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
 
@@ -49,7 +53,7 @@ def chart_concentration_naive_vs_rarefied() -> None:
 
     x2 = raref["year"].values
     ax2.plot(x2, raref["rarefied_unique_at_n"], "o-", color="#38a169",
-             label="unique deps recovered in a fixed 140-edge sample")
+             label=f"unique deps recovered in a fixed {n_draw}-edge sample")
     ax2.fill_between(
         x2,
         raref["rarefied_unique_at_n"] - raref["rarefied_unique_std"],
@@ -57,8 +61,8 @@ def chart_concentration_naive_vs_rarefied() -> None:
         color="#38a169", alpha=0.15,
     )
     _trend_line(ax2, x2, raref["rarefied_unique_at_n"].values, "#38a169")
-    ax2.set_title("Corrected for sample size: flat\n(rarefied to 140 edges/year, Spearman ρ=-0.01, p=0.99)")
-    ax2.set_ylabel("unique dependency names per 140 edges")
+    ax2.set_title(f"Corrected for sample size: flat\n(rarefied to {n_draw} edges/year, Spearman ρ={rho:.2f}, p={p:.2f})")
+    ax2.set_ylabel(f"unique dependency names per {n_draw} edges")
     ax2.set_xlabel("cohort year")
 
     fig.suptitle("Is dependency diversity really shrinking over time, or is that just more data per year?", fontsize=11)

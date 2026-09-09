@@ -124,6 +124,7 @@ def rarefied_diversity(edges: pd.DataFrame, group_col: str, n_draw: int = 140,
         ]
         rows.append({
             group_col: cohort,
+            "n_draw": n_draw,
             "n_edges_available": len(names),
             "rarefied_unique_at_n": float(np.mean(unique_counts)),
             "rarefied_unique_std": float(np.std(unique_counts)),
@@ -176,7 +177,7 @@ def main() -> None:
     print(by_y.to_string(index=False))
 
     print("\n=== Rarefied diversity (fixed sample size, controls for volume growth) ===")
-    raref = rarefied_diversity(edges, "year", n_draw=140)
+    raref = rarefied_diversity(edges, "year", n_draw=400)  # smallest year (2015) has 404 edges at 30/quarter scale
     raref.to_csv(TIME_DIR / "rarefied_diversity_by_year.csv", index=False)
     t_raref = trend_test(raref, "year", ["rarefied_unique_at_n"])
     t_raref.to_csv(TIME_DIR / "trend_rarefied_diversity.csv", index=False)
