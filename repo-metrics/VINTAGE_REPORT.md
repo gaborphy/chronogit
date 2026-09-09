@@ -166,6 +166,67 @@ still living inside a 2026 mature codebase — and only visible with the
 mean, not the median, once the cohort is large enough for the median to
 be dominated by the (parseable) majority.
 
+## How this compares to the published literature
+
+Complexity and size growth as software matures is one of the most heavily
+studied phenomena in software engineering, going back to Lehman's laws of
+software evolution. Empirical support is generally favorable for the
+growth laws specifically: Alenezi's study of five open-source systems
+found complexity growth conforms to Lehman's second law [1], while
+Godfrey and Tenant's Linux kernel case study found growth so strong it
+was super-linear, exceeding what Lehman's original model assumed [2].
+This report's own headline finding — that newly-founded packages start
+out bigger and more complex depending on *when* they were founded, not
+just as they individually age — sits on a different axis from either of
+these (they track a single system's growth across its own releases; this
+report compares different systems at the same relative age across
+different founding eras), but is consistent with the broader picture that
+growth in open-source software is a robust, widely-replicated phenomenon
+rather than an artifact of any one project.
+
+The closest direct comparison is Yan et al.'s cross-community study of
+cyclomatic complexity and lines-of-code-per-function trends across
+Apache, Google, and Spring projects, explicitly framed as "relevant for
+evaluating AI-generated code" [3]. They attribute rising complexity
+mainly to feature growth and fault-tolerance logic in distributed
+systems, and find that continuous refactoring by key contributors can
+curb the rise — an important, testable alternative explanation this
+report doesn't rule out: some of the vintage-cohort growth measured here
+could reflect newer packages tackling more demanding problem domains from
+the start (more distributed/infra-heavy software being founded now than
+in 2014) rather than a shift in how *comparable* software gets written.
+This report cannot distinguish "the same kind of software is now written
+bigger" from "a different, more complex kind of software is now being
+written" — a limitation worth stating plainly alongside the
+AI-authorship one already in this report.
+
+On the docstring-rate finding specifically: Ji et al.'s detector-based
+study of LLM-generated code and comments across company- and
+community-maintained repositories (2021–2025) found that code flagged as
+likely LLM-generated *decreased* over their study window, while
+LLM-generated comments remained comparatively stable [4] — a result that
+sits in tension with this report's finding of a sharp docstring-rate
+acceleration starting 2024Q4. The two studies use different detection
+approaches (Ji et al. use content-based LLM-output detectors; this report
+measures documentation *coverage*, not authorship) and different
+repository populations (established repos vs. this report's
+newly-founded ones), so they aren't measuring the same thing — but the
+discrepancy is worth flagging rather than smoothing over. This report's
+docstring finding should be read as "newly-founded packages are more
+thoroughly documented in the AI era," not as direct evidence of AI
+authorship, which Ji et al.'s more targeted methodology suggests may
+itself be a more complicated, non-monotonic trend than a simple rise.
+
+### References
+
+[1] [Empirical Analysis of the Complexity Evolution in Open-Source Software Systems](https://consensus.app/papers/details/41c8f7d8b3c553519acc63405144ff2c/?utm_source=claude_desktop) (Alenezi et al., 2015, *International Journal of Hybrid Information Technology*)
+
+[2] [Evolution in open source software: a case study](https://consensus.app/papers/details/ab652abf262259f4ac052d932af544a3/?utm_source=claude_desktop) (Godfrey & Tenant, 2000, ICSM)
+
+[3] [Evolving Trends in Cleanliness of Open Source Projects](https://consensus.app/papers/details/0c06a6ea820453ea80d3b6847bc2105f/?utm_source=claude_desktop) (Yan et al., 2026, *ACM Transactions on Software Engineering and Methodology*)
+
+[4] [An exploratory study on LLM-generated code and comments in code repositories](https://consensus.app/papers/details/30b1626094445398b1c1427382cd7606/?utm_source=claude_desktop) (Ji et al., 2026, *Journal of Systems and Software*)
+
 ## Data & reproducing this
 
 - Discovered candidates (up to 100/quarter, before package validation):

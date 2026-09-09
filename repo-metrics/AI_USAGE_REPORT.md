@@ -152,6 +152,68 @@ Full table: `output/ai_signal/analysis/top15_ai_attributed.csv`.
 - **2026 is a partial year** on a smaller sample (90 vs. 120 packages) —
   treat the 73.3% figure as directional, not a stable annual rate.
 
+## How this compares to the published literature
+
+The closest published counterpart is Robbes et al.'s census of
+coding-agent adoption across 128,018 GitHub projects, using the same core
+signal this report relies on — explicit commit-level traces such as
+co-authoring — because, as they put it, unlike completion-only tools,
+agents "tend to leave more explicit traces in software engineering
+artifacts" [1]. Their measured adoption rate as of February 2026
+(22.2%–28.66%, and rising) sits below this report's 73% for the 2026
+birth-cohort, but the two studies aren't measuring the same population:
+Robbes et al. sample all of GitHub regardless of project age, while this
+report specifically follows newly-founded packages — which the
+vintage-cohort study already found is the part of the ecosystem where
+every code-shape metric moved fastest. A newborn-package sample showing
+higher AI-tool prevalence than an all-ages one is exactly what you'd
+expect if AI-tool adoption itself correlates with project recency, which
+both studies independently point toward. Robbes et al. also found that
+agent-assisted commits are larger than human-only commits [1] — an
+independent corroboration of this project's own vintage-cohort finding
+that median added-lines-per-hunk, flat for a decade, climbs sharply
+starting specifically 2025Q3, the same window this report's adoption
+curve inflects.
+
+Khosravani et al.'s multi-method census across 180 million repositories
+in World of Code is the most methodologically direct comparison: they
+combine configuration-file scanning, commit-message analysis,
+author-identity matching, and bot-signature lookup — the same two signal
+families this report uses (commit trailers, config files), plus two this
+report doesn't (author-identity, bot-account matching) [2]. Their central
+finding validates this report's central caveat with a hard number:
+bot-account lookup, "the signal most adoption studies rely on," recovers
+only 3.3% of the Claude Code commits their full multi-method approach
+finds — a 30× relative-recall gap. That quantifies, for a sibling
+methodology, exactly the undercounting this report describes
+qualitatively for GitHub Copilot's silent autocomplete mode. Khosravani
+et al. also find Claude Code "dominates silent, configuration-file-only
+adoption" among the tools they track [2], matching this report's own
+tool-breakdown finding — both studies converge on the same tool topping
+the self-disclosure ranking, reinforcing that the ranking reflects
+disclosure convention, not necessarily usage share.
+
+Xiao et al.'s earlier "self-admitted GenAI usage" study, searching commit
+messages, code comments, and documentation across 200,000+ repositories,
+found only 1,292 such self-admissions across 156 repositories [3] — a far
+lower prevalence than this report's later numbers, consistent with (not
+contradicting) this report's own finding that self-disclosed usage was
+near-zero before 2024 and only became common in 2025–2026; the two
+studies sit at different points on the same rising curve. Xiao et al.
+also report finding "no general increase" in code churn following GenAI
+adoption [3] — a caveat worth carrying alongside this report's own
+commit-velocity numbers, since neither study establishes that AI-tool
+usage *causes* more code to be written, only that it's increasingly
+present.
+
+### References
+
+[1] [Agentic Much? Adoption of Coding Agents on GitHub](https://consensus.app/papers/details/20050425973953e9b0a6c9f316e85d44/?utm_source=claude_desktop) (Robbes et al., 2026, *ACM Transactions on Software Engineering and Methodology*)
+
+[2] [Detecting AI Coding Agents in Open Source: A Validated Multi-Method Census of 180 Million Repositories](https://consensus.app/papers/details/d9f42bd4b4e05f78824808f090534384/?utm_source=claude_desktop) (Khosravani et al., 2026, ArXiv)
+
+[3] [Self-Admitted GenAI Usage in Open-Source Software](https://consensus.app/papers/details/aea2e62ca2295dfcaf8a4c87e8e358ec/?utm_source=claude_desktop) (Xiao et al., 2025, *IEEE Transactions on Software Engineering*)
+
 ## Data & reproducing this
 
 - Per-package signals: `output/ai_signal/ai_signals.csv`

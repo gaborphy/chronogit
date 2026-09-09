@@ -245,6 +245,77 @@ trend-correction check, not driven by one repo's absolute size):
 
 ---
 
+## How this compares to the published literature
+
+Lehman's laws of software evolution predict continual growth in size and
+complexity for actively-maintained systems, and this panel's mature-repo
+tracking is broadly consistent with that — though the empirical literature
+is more divided on *why* and *how much* than a flat "complexity always
+rises" reading suggests. Alenezi's study of five open-source systems found
+complexity growth over ten releases conforms to Lehman's second law [1];
+Neamtiu et al.'s study spanning 653 releases across seven projects and 69
+combined years of evolution similarly confirmed several of Lehman's laws
+while finding others depend heavily on how they're operationally defined
+[2] — a caution this report's own event-study section (where a naive break
+signal dissolved under proper trend-correction) independently illustrates.
+Godfrey and Tenant's Linux kernel case study found growth so strong it was
+*super-linear* — accelerating, not merely continuing [3] — a more dramatic
+pattern than this panel's own modest, multi-year drifts (function length
++25%, complexity +4.7% over 12 years), suggesting the 10 repos tracked
+here sit toward the calmer end of what's been observed, not an outlier in
+the other direction.
+
+Yan et al.'s cross-community study of Apache, Google, and Spring
+projects — explicitly framed around metrics "relevant for evaluating
+AI-generated code" — found complexity and lines-of-code-per-function both
+rise as projects mature, attributed mainly to feature growth and
+fault-tolerance logic, and found that continuous refactoring by key
+contributors can curb the rise [4]. That refactoring-as-counterweight
+mechanism isn't tested directly here but is consistent with the
+sqlalchemy/pandas author-concentration cases already discussed: a small
+number of dominant contributors shape a repo's trajectory disproportionately,
+for better or worse.
+
+On comments specifically: Fluri et al.'s co-evolution study of eight
+systems found that the *relative amount* of comments and code grows at
+about the same rate [5] — a finding about comment *volume* tracking code
+volume, not about comment *length* per comment, which is what this report
+measures and finds essentially flat across 12 years. The two are
+compatible, not contradictory: more code could bring proportionally more
+comments (Fluri et al.'s finding) while each individual comment stays
+about the same length (this report's finding) — together they'd suggest
+people write more comments as code grows, without writing longer ones.
+Ebiwonjumi et al.'s study of documentation-commit patterns before
+(2018–2021) and after (2022–2025) the rise of AI coding tools — run on six
+repositories including pandas, one of this panel's own ten — found an
+8.3% *decrease* in documentation-focused commits alongside a 53.4%
+increase in commit message detail across that boundary [6]. This report's
+own event-study explicitly tested for a break at the ChatGPT release date
+across all ten repos and found none that survived correcting for each
+repo's pre-existing trend; Ebiwonjumi et al.'s finding — measured
+differently (commit classification, not a trend-corrected panel
+regression) and on a narrower repo set — is a useful point of tension
+rather than confirmation. "No discrete break survives a rigorous test"
+and "no effect exists" are different claims, and a more targeted
+commit-classification approach might surface an effect this panel's
+whole-codebase quarterly aggregates smooth over.
+
+### References
+
+[1] [Empirical Analysis of the Complexity Evolution in Open-Source Software Systems](https://consensus.app/papers/details/41c8f7d8b3c553519acc63405144ff2c/?utm_source=claude_desktop) (Alenezi et al., 2015, *International Journal of Hybrid Information Technology*)
+
+[2] [Towards a better understanding of software evolution: An empirical study on open source software](https://consensus.app/papers/details/694e613b3435554aa076bc825fa76df2/?utm_source=claude_desktop) (Neamtiu et al., 2009, ICSM)
+
+[3] [Evolution in open source software: a case study](https://consensus.app/papers/details/ab652abf262259f4ac052d932af544a3/?utm_source=claude_desktop) (Godfrey & Tenant, 2000, ICSM)
+
+[4] [Evolving Trends in Cleanliness of Open Source Projects](https://consensus.app/papers/details/0c06a6ea820453ea80d3b6847bc2105f/?utm_source=claude_desktop) (Yan et al., 2026, *ACM Transactions on Software Engineering and Methodology*)
+
+[5] [Analyzing the co-evolution of comments and source code](https://consensus.app/papers/details/848a3e9bf61e536cb67c68eac26e4b26/?utm_source=claude_desktop) (Fluri et al., 2009, *Software Quality Journal*)
+
+[6] [Do Generative AI Tools Change How Developers Comment and Document Code?](https://consensus.app/papers/details/db7639c7ef7a5ebba8067c6f4e652450/?utm_source=claude_desktop) (Ebiwonjumi et al., 2026, ICAIIC)
+
+---
+
 ## Data & reproducing this
 
 - Raw per-commit rows: `output/<repo>_panel_a.csv`

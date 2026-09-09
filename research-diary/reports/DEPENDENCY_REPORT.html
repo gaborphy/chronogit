@@ -442,6 +442,52 @@ inference from what a package imports.</p>
   could theoretically be a dependency" universe is unmeasurable; this
   baseline is the closest practical proxy.</li>
 </ul>
+<h2 id="how-this-compares-to-the-published-literature">How this compares to the published literature</h2>
+<p>This report's core finding — that popularity predicts dependency
+selection — replicates a specific, direct empirical result from a
+different ecosystem and a different methodology. Mujahid et al. surveyed
+118 npm developers and then validated quantitatively across 2,527
+packages that "highly-selected" packages correlate with download counts,
+GitHub stars, and README size [1]. That's the same relationship this
+report finds via case-control on PyPI rather than npm, comparing a
+dependency-set against a random baseline rather than "highly-selected"
+against "not" — two independent methods landing on the same conclusion.
+Vargas et al.'s interview study of 16 developers and survey of 115 more
+identified 26 factors developers weigh when selecting a library, of which
+popularity/community size is one among many technical, human, and
+economic considerations [2] — consistent with this report's own finding
+that popularity is close to necessary but not sufficient for broad
+adoption (the fan-in analysis above). Zerouali et al. found that
+different popularity metrics (stars, downloads, dependents) are only
+loosely correlated with each other across 175k npm packages [3] —
+matching this report's own observation that stars/forks and
+lifetime-contributor-count behave differently (a ~90% vs. 67% effect-size
+split): "popularity" isn't one thing, on either ecosystem.</p>
+<p>On mechanism: software dependency networks are a well-studied case of
+preferential-attachment growth, where new nodes (packages) are more
+likely to connect to already well-connected ones, producing the
+heavy-tailed degree distributions this report's tier-breakdown chart
+shows directly. Tessone et al.'s network-growth model of 18 Java projects
+found dependency networks transition from an early regime of increasing
+density toward a self-limiting "sustainable regime" as the network
+matures, rather than collapsing under runaway concentration [4] — a
+theoretical account consistent with this report's own time-dimension
+finding that dependency concentration is <em>not</em> rising over cohort years
+despite the ecosystem growing substantially larger. That's a useful
+counterpoint to any intuition that preferential attachment alone should
+predict ever-increasing concentration: the literature's own models say
+otherwise once a network matures. Lee's more recent Bayesian model of the
+CRAN (R) dependency network confirms superlinear preferential attachment
+while finding it behaves differently for new packages adding a dependency
+versus existing packages doing the same [5] — a distinction this report
+doesn't examine (every edge here originates from a newborn package, by
+construction) but flags as a natural extension.</p>
+<h3 id="references">References</h3>
+<p>[1] <a href="https://consensus.app/papers/details/d6b4bbb6d560588197de5a485be26c22/?utm_source=claude_desktop">What are the characteristics of highly-selected packages? A case study on the npm ecosystem</a> (Mujahid et al., 2022, <em>Journal of Systems and Software</em>)</p>
+<p>[2] <a href="https://consensus.app/papers/details/bbe28523cde45af48d9806289080286f/?utm_source=claude_desktop">Selecting third-party libraries: the practitioners' perspective</a> (Vargas et al., 2020, ESEC/FSE)</p>
+<p>[3] <a href="https://consensus.app/papers/details/fa984e28f2275b2cb6fbe96347a12d24/?utm_source=claude_desktop">On the Diversity of Software Package Popularity Metrics: An Empirical Study of npm</a> (Zerouali et al., 2019, SANER)</p>
+<p>[4] <a href="https://consensus.app/papers/details/fce12038a05b531b86761b56efdacc4c/?utm_source=claude_desktop">Sustainable growth in complex networks</a> (Tessone et al., 2010, <em>EPL</em>)</p>
+<p>[5] <a href="https://consensus.app/papers/details/bfb4448e8ac153ee8949b300dc08ee92/?utm_source=claude_desktop">Evidencing preferential attachment in dependency network evolution</a> (Lee, 2025, ArXiv)</p>
 <h2 id="data-reproducing-this">Data &amp; reproducing this</h2>
 <ul>
 <li>Dependency edges (newborn → dependency): <code>output/deps/edges.csv</code></li>
