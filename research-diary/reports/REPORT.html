@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How has Python source code changed since 2014? - ChronoGit Research Diary</title>
+<link rel="stylesheet" href="../vendor/bootstrap-yeti.min.css">
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand mb-0 h1" href="../index.html">&larr; ChronoGit Research Diary</a>
+    </div>
+  </nav>
+  <div class="container report-container">
+<h1 id="how-has-python-source-code-changed-since-2014">How has Python source code changed since 2014?</h1>
+<p>Ten mature, actively-maintained Python projects, two independent measurement
+panels, four metric families, 2014Q1&ndash;2026Q2 (2026Q3 excluded everywhere
+below as the partial trailing quarter). Methodology, the file filter, and
+every extraction caveat are in <a href="README.html">README.md</a>; this document is the
+findings.</p>
+<p><strong>Sample:</strong></p>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th>repo</th>
+<th>HEAD (short)</th>
+<th style="text-align: right;">Panel A rows</th>
+<th style="text-align: right;">Panel B quarters</th>
+<th style="text-align: right;">clone size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>pandas</td>
+<td><code>04dff44f6224</code></td>
+<td style="text-align: right;">23,579</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">451 MB</td>
+</tr>
+<tr>
+<td>numpy</td>
+<td><code>d9079517ca17</code></td>
+<td style="text-align: right;">11,250</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">212 MB</td>
+</tr>
+<tr>
+<td>scipy</td>
+<td><code>f389d8d3514b</code></td>
+<td style="text-align: right;">16,711</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">228 MB</td>
+</tr>
+<tr>
+<td>scikit-learn</td>
+<td><code>2cc7893a2097</code></td>
+<td style="text-align: right;">12,833</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">211 MB</td>
+</tr>
+<tr>
+<td>matplotlib</td>
+<td><code>8a621d3bbebb</code></td>
+<td style="text-align: right;">21,342</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">532 MB</td>
+</tr>
+<tr>
+<td>django</td>
+<td><code>fc4eaaabf419</code></td>
+<td style="text-align: right;">12,711</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">321 MB</td>
+</tr>
+<tr>
+<td>sqlalchemy</td>
+<td><code>121d0cde4679</code></td>
+<td style="text-align: right;">5,628</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">126 MB</td>
+</tr>
+<tr>
+<td>sympy</td>
+<td><code>3cbbd286f761</code></td>
+<td style="text-align: right;">30,644</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">216 MB</td>
+</tr>
+<tr>
+<td>ipython</td>
+<td><code>e18b391ad00d</code></td>
+<td style="text-align: right;">6,906</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">91 MB</td>
+</tr>
+<tr>
+<td>pytest</td>
+<td><code>3fd8675d6d79</code></td>
+<td style="text-align: right;">5,988</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">48 MB</td>
+</tr>
+</tbody>
+</table>
+<p>Full HEAD SHAs, extraction timestamps, and clone/run timings are in
+<code>output/&lt;repo&gt;_meta.json</code>. <code>parse_rate</code> is reported per repo-quarter in
+<code>output/&lt;repo&gt;_panel_b.csv</code>; every repo reaches 1.00 well before 2020 (pandas
+and scikit-learn take until ~2017 to clear legacy Python-2-only syntax in a
+few files — see README for the specific example verified during validation).</p>
+<hr />
+<h2 id="family-1-comment-length">Family 1 — comment length</h2>
+<p><img class="img-fluid rounded border my-3" alt="Family 1: comment length" src="../../repo-metrics/output/charts/family1_comment_length.png" /></p>
+<p>Both panels move the same direction — comment length has grown steadily,
+not suddenly — but disagree on how much, which is the point of running two
+panels: <strong>state</strong> (mean length of every <code>#</code> comment in the codebase at
+quarter-end, Panel B) rose a fixed-effects-pooled <strong>+9.0%</strong> over the window
+(42.7 → 46.6 chars); <strong>flow</strong> (mean length of comments newly <em>added</em> that
+quarter, Panel A) rose <strong>+13.4%</strong> (45.7 → 51.8 chars) and is visibly
+noisier quarter to quarter. That gap is expected: state is a slow-moving
+average over everything ever written and still standing, while flow reacts
+immediately to whatever a handful of large commits did that quarter (see
+the pandas 2026Q2 note under Author decomposition below for a concrete
+case of flow being author-sensitive in a way state isn't).</p>
+<h2 id="family-2-code-complexity">Family 2 — code complexity</h2>
+<p><img class="img-fluid rounded border my-3" alt="Family 2: complexity" src="../../repo-metrics/output/charts/family2_complexity.png" /></p>
+<p>Mean McCabe complexity per function grew a fixed-effects-pooled <strong>+4.7%</strong>
+(3.26 → 3.42) — the smallest movement of any of the four families, and it
+is not a smooth trend so much as several <em>repo-specific</em> step changes
+(visible as literal steps in the p90 line, since p90 of a small integer
+distribution quantizes): pandas steps up around 2017, numpy steps <em>down</em>
+around 2018&ndash;2019, scikit-learn steps up twice (2015, 2019). sympy's
+swings are the largest in the sample and are a composition artifact, not a
+complexity story — see the Event study section.</p>
+<h2 id="family-3-function-length">Family 3 — function length</h2>
+<p><img class="img-fluid rounded border my-3" alt="Family 3: function length" src="../../repo-metrics/output/charts/family3_function_length.png" /></p>
+<p>This is the headline check from the brief, and it replicates <strong>across the
+whole panel, not just pandas</strong>: <code>mean_func_len</code> (total span, includes the
+docstring) rose a pooled <strong>+25.0%</strong> (17.9 → 22.4 lines) while
+<code>mean_body_len</code> (docstring subtracted) rose only <strong>+17.0%</strong> (12.1 → 14.1
+lines). In every one of the 10 small multiples the solid (total) line
+visibly separates from the dashed (body) line over time — functions are
+getting longer, but a real share of that growth is documentation, and
+reporting only <code>mean_func_len</code> overstates how much the <em>executable</em> body
+of a typical function has grown by roughly a third of the apparent effect,
+consistently across the sample.</p>
+<p>sympy is excluded from the "smooth trend" characterization here — its two
+sharp discontinuities (2018Q3, 2022Q4) are a distinct phenomenon, addressed
+under Event study.</p>
+<h2 id="family-4-size-of-added-parts">Family 4 — size of added parts</h2>
+<p><img class="img-fluid rounded border my-3" alt="Family 4: added part size" src="../../repo-metrics/output/charts/family4_added_part_size.png" /></p>
+<p>The cleanest result in the whole study. <strong>Median added lines per hunk —
+the size of one contiguous, atomic edit — is essentially flat across all
+10 repos and all 12 years</strong>: pooled fixed-effects change is <strong>+4.3%</strong>
+(2.09 → 2.18 lines), noise-level. Meanwhile <strong>median added code lines per
+commit rose +43.5%</strong> (2.3 → 3.3 lines) over the same window. Read together:
+the growth is not in how big a single edit is — people still touch a
+couple of lines at a time — it's in how many hunks/files a typical commit
+now bundles together. "Commits got bigger" and "edits got bigger" are
+different claims, and this panel only supports the first one.</p>
+<hr />
+<h2 id="pooled-series-with-repo-fixed-effects">Pooled series with repo fixed effects</h2>
+<p><img class="img-fluid rounded border my-3" alt="Pooled fixed effects" src="../../repo-metrics/output/charts/pooled_fixed_effects.png" /></p>
+<p>Each line is within-repo demeaned before averaging, then re-centered on
+the panel's grand mean and indexed to its own 2014Q1 value — so a single
+large project (pandas, with 4&times; sympy's function count) can't just
+outweigh the others by sitting at a higher absolute level. The ranking
+holds even after that correction: function length moved the most, then
+body length, then state comment length, then complexity (left panel); on
+the flow side (right), added-code-lines-per-commit is both the biggest
+mover and by far the noisiest, comment-flow is a distant second, and
+hunk size is flat (right panel) — same conclusions as the per-family
+charts, confirming they aren't an artifact of one or two large repos.</p>
+<h2 id="event-study">Event study</h2>
+<p>Four candidate break dates were tested against a null of "no discrete
+shift": 2018Q1 (roughly when several of these projects began simplifying
+away Python-2 support), 2020Q1 (COVID-era shift to remote work), 2022Q4
+(ChatGPT's public release, Nov 30 2022 — the natural candidate given this
+project's broader AI-adoption research context), and 2023Q1.</p>
+<p><strong>Naive pre/post mean comparison is misleading here.</strong> At <em>every</em> candidate
+date, function length, body length, and comment length show up as "9 or 10
+of 10 repos moved in the same direction" — which looks exactly like the
+break signature the brief warned to look for, except it shows up
+identically at 2018Q1 as at 2022Q4. That's the signature of a persistent
+multi-year growth trend, not a break at any particular point: any split of
+a monotonically rising series looks like "everyone moved up after X."</p>
+<p><strong>The actual test:</strong> fit each repo's own linear trend on the quarters
+<em>before</em> the candidate date, extrapolate it forward, and check whether the
+real values land on that line or jump away from it. Deviation-from-own-trend
+plots for all four state metrics:</p>
+<p><img class="img-fluid rounded border my-3" alt="Event study: function length" src="../../repo-metrics/output/charts/event_study_func_len.png" />
+<img class="img-fluid rounded border my-3" alt="Event study: body length" src="../../repo-metrics/output/charts/event_study_body_len.png" />
+<img class="img-fluid rounded border my-3" alt="Event study: complexity" src="../../repo-metrics/output/charts/event_study_complexity.png" />
+<img class="img-fluid rounded border my-3" alt="Event study: comment length" src="../../repo-metrics/output/charts/event_study_comment_len.png" /></p>
+<p>Once each repo is compared to its own pre-existing trend rather than a
+flat pre-period average, the mean-across-repos line (red) sits within a
+few percent of 1.0 throughout — no sustained, panel-wide jump at 2022Q4 or
+any other candidate date. <strong>Conclusion: no evidence of a discrete,
+panel-wide structural break in comment length, complexity, function
+length, or added-part size at any tested date, including the ChatGPT
+release.</strong> This is a real negative result, not an absence of looking — it
+doesn't rule out effects too small, too gradual, or too concentrated in
+specific authors/files for a whole-codebase quarterly aggregate to surface
+(that question needs the AI-detector pipeline elsewhere in this project,
+which operates at function granularity, not the corpus-wide average used
+here).</p>
+<p><strong>What the gray lines in those plots <em>do</em> show is a single-repo artifact
+worth naming explicitly, because it's exactly the failure mode this
+exercise is designed to catch.</strong> sympy is the visible outlier fanning away
+from 1.0 in all three of function length (1.86&times; trend by 2026Q2),
+body length (1.51&times;), and complexity (1.66&times;) — every other repo
+stays within roughly &plusmn;20%. Looking at sympy's raw <code>n_functions</code>
+column explains it without any complexity story: <code>n_functions</code> jumps from
+16,071 to 25,579 between 2018Q2 and 2018Q3 (mean length instantly drops
+19.7&rarr;14.2 as thousands of short functions enter the population), then
+<em>drops</em> from 29,792 to 19,810 between 2022Q3 and 2022Q4 (mean length jumps
+back up 13.7&rarr;18.1 as that population leaves). <code>n_files</code> barely moves
+either time (813&rarr;783 in the second case). A large module was added
+around mid-2018 and something comparable was removed or relocated around
+Q4 2022 — a codebase composition change, not a shift in how anyone writes
+functions. numpy shows a smaller, same-direction echo (1.22&times; on
+function length) worth a similar sanity check before trusting it. <strong>This
+is why Panel B carries <code>n_files</code>/<code>parsed_files</code>/<code>n_functions</code> alongside
+every aggregate: without them this would have been reported as "sympy's
+code got 86% more complex," which is false.</strong></p>
+<h2 id="author-controlled-decomposition">Author-controlled decomposition</h2>
+<p><img class="img-fluid rounded border my-3" alt="Author decomposition" src="../../repo-metrics/output/charts/author_decomposition_comment_len.png" />
+<img class="img-fluid rounded border my-3" alt="Contributor counts" src="../../repo-metrics/output/charts/contributor_counts.png" /></p>
+<p>Top-volume contributor per repo, share of that repo's commits in the full
+2014&ndash;2026 window:</p>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th>repo</th>
+<th>top contributor</th>
+<th style="text-align: right;">share</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sqlalchemy</td>
+<td>Mike Bayer</td>
+<td style="text-align: right;">70.9%</td>
+</tr>
+<tr>
+<td>pandas</td>
+<td>jbrockmendel</td>
+<td style="text-align: right;">23.3%</td>
+</tr>
+<tr>
+<td>matplotlib</td>
+<td>Antony Lee</td>
+<td style="text-align: right;">17.0%</td>
+</tr>
+<tr>
+<td>pytest</td>
+<td>Bruno Oliveira</td>
+<td style="text-align: right;">17.7%</td>
+</tr>
+<tr>
+<td>ipython</td>
+<td>Matthias Bussonnier</td>
+<td style="text-align: right;">15.8%</td>
+</tr>
+<tr>
+<td>django</td>
+<td>Tim Graham</td>
+<td style="text-align: right;">13.2%</td>
+</tr>
+<tr>
+<td>scipy</td>
+<td>Matt Haberland</td>
+<td style="text-align: right;">11.0%</td>
+</tr>
+<tr>
+<td>numpy</td>
+<td>Sebastian Berg</td>
+<td style="text-align: right;">8.6%</td>
+</tr>
+<tr>
+<td>sympy</td>
+<td>Oscar Benjamin</td>
+<td style="text-align: right;">6.3%</td>
+</tr>
+<tr>
+<td>scikit-learn</td>
+<td>Guillaume Lemaitre</td>
+<td style="text-align: right;">4.2%</td>
+</tr>
+</tbody>
+</table>
+<p>Every quarterly series in <code>output/analysis/panel_a_quarterly.csv</code> carries
+both a <code>pooled_*</code> and an <code>excltop_*</code> column, plus <code>pooled_n_contributors</code> /
+<code>excltop_n_contributors</code>, so any of the flow metrics can be rebuilt with or
+without the dominant contributor without touching raw data.</p>
+<p>Two concrete cases where this matters:</p>
+<ul>
+<li><strong>sqlalchemy is a reliability warning, not just a decomposition.</strong> Mike
+  Bayer made 70.9% of all commits in-window, and in several quarters
+  (2017Q3: 95 pooled commits, 5 left after excluding him) the "excluding
+  top contributor" series is an estimate over a handful of commits — the
+  wide swings in its dashed line in the small multiples above are sampling
+  noise, not signal. Any read of sqlalchemy's excl-top series should carry
+  the quarter's <code>excltop_n_commits</code> alongside it.</li>
+<li><strong>pandas 2026 reproduces the exact pitfall the brief described.</strong> In
+  2026Q2, jbrockmendel made 342 of 496 commits (69%) touching in-scope
+  files; pooled mean added-comment-length that quarter is 54.6 chars,
+  excluding him it's 57.3 — a real difference driven by one contributor's
+  commenting style dominating the pooled number for that specific quarter.
+  Across the full window his share is a more moderate 23.3%, so this is a
+  quarter-level effect, not a repo-level one — another reason the pooled
+  number alone isn't enough.</li>
+</ul>
+<p>Distinct-contributor counts per quarter range from single digits
+(sqlalchemy, pytest, ipython in early quarters) up to ~200 (pandas at
+peak) — see <code>contributor_counts.png</code> and the <code>pooled_n_contributors</code>
+column for the full per-repo-quarter series.</p>
+<hr />
+<h2 id="whats-robust-vs-what-isnt">What's robust vs. what isn't</h2>
+<p><strong>Robust across the panel</strong> (holds in 9&ndash;10 of 10 repos, survives the
+trend-correction check, not driven by one repo's absolute size):
+- function length grows faster than body length everywhere (Family 3
+  headline finding)
+- median hunk size is flat everywhere (Family 4 headline finding)
+- comment length drifts up gradually in both panels, everywhere
+- no discrete break at any of the four tested candidate dates, in any of
+  the four families</p>
+<p><strong>Single-repo or quarter-level artifacts — do not generalize:</strong>
+- sympy's complexity/length swings at 2018Q3 and 2022Q4 (composition
+  effect from a module addition/removal, confirmed via <code>n_functions</code>)
+- sqlalchemy's excl-top series in low-commit quarters (small-N noise, not
+  a real behavioral difference)
+- pandas's 2026Q2 comment-length gap between pooled and excl-top (one
+  contributor's temporary dominance that quarter, not a repo-wide shift)</p>
+<p><strong>Noisiest / least conclusive:</strong>
+- Panel A's <code>median_added_code_lines_per_commit</code> — real upward drift
+  (+43.5% pooled) but with the highest quarter-to-quarter variance of any
+  series in this study; treat individual-quarter values as unreliable and
+  read the trend, not the level.</p>
+<hr />
+<h2 id="data-reproducing-this">Data &amp; reproducing this</h2>
+<ul>
+<li>Raw per-commit rows: <code>output/&lt;repo&gt;_panel_a.csv</code></li>
+<li>Quarterly codebase-state snapshots: <code>output/&lt;repo&gt;_panel_b.csv</code></li>
+<li>Extraction provenance (HEAD SHA, dates, clone size/time): <code>output/&lt;repo&gt;_meta.json</code></li>
+<li>Quarterly rollups (pooled + excl-top-contributor + contributor counts):
+  <code>output/analysis/panel_a_quarterly.csv</code></li>
+<li>Top-contributor table: <code>output/analysis/top_contributors.csv</code></li>
+<li>Event-study residual series: <code>output/analysis/event_study_*.csv</code></li>
+<li>Regenerate everything: <code>python3 src/analysis.py &amp;&amp; python3 src/charts.py</code>
+  (re-running <code>src/driver.py</code> first is a no-op unless <code>src/config.py</code> changes)</li>
+</ul>
+  </div>
+</body>
+</html>

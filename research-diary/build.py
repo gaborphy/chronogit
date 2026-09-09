@@ -14,7 +14,7 @@ Each post is a markdown file with YAML frontmatter:
       - "Headline finding 3 (optional), quantified."
     links:
       - label: Full report
-        path: ../repo-metrics/REPORT.md
+        path: reports/REPORT.html
     ---
 
     Optional longer body -- extra notes, caveats, bugs caught during
@@ -31,6 +31,8 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
+
+from render_reports import render_all as render_reports
 
 ROOT = Path(__file__).resolve().parent
 POSTS_DIR = ROOT / "posts"
@@ -159,6 +161,9 @@ PAGE_TEMPLATE = """<!doctype html>
 
 
 def main() -> None:
+    print("Rendering repo-metrics reports to reports/*.html ...")
+    render_reports()
+
     posts = load_all_posts()
     rendered = "\n\n".join(render_post(p) for p in posts)
     page = PAGE_TEMPLATE.format(posts=rendered, count=len(posts))

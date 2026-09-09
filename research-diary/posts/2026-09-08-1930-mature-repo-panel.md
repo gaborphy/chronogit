@@ -11,9 +11,9 @@ key_results:
   - "An event-study scan for a discrete break at four candidate dates (including the Nov 2022 ChatGPT release) found none that survives correcting for each repo's own pre-existing trend; sympy's dramatic-looking complexity swings turned out to be a function-count composition artifact, not a code-complexity story."
 links:
   - label: Full report
-    path: ../repo-metrics/REPORT.md
+    path: reports/REPORT.html
   - label: Methodology & file-filter rules
-    path: ../repo-metrics/README.md
+    path: reports/README.html
   - label: Raw panel data (per repo)
     path: ../repo-metrics/output/
   - label: Aggregated quarterly series

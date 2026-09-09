@@ -13,7 +13,7 @@ key_results:
   - "Within the dependency set, being depended on by more of the 490 newborns correlates only moderately with popularity (Spearman ~0.3) -- popularity looks close to necessary for broad adoption but isn't sufficient (pyyaml, six rank top-10 by fan-in despite modest star counts)."
 links:
   - label: Full report
-    path: ../repo-metrics/DEPENDENCY_REPORT.md
+    path: reports/DEPENDENCY_REPORT.html
   - label: Dependency edges & resolved popularity data
     path: ../repo-metrics/output/deps/
   - label: Charts

@@ -12,9 +12,9 @@ key_results:
   - "Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven."
 links:
   - label: Full report
-    path: ../repo-metrics/VINTAGE_REPORT.md
+    path: reports/VINTAGE_REPORT.html
   - label: Methodology & pipeline caveats
-    path: ../repo-metrics/README.md
+    path: reports/README.html
   - label: Per-package data
     path: ../repo-metrics/output/vintage/packages.csv
   - label: Cohort-quarter aggregates

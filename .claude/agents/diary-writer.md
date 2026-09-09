@@ -14,9 +14,12 @@ you're invoked:
 ## 1. Find what's already been posted
 
 Read the frontmatter of every file in `research-diary/posts/*.md` and
-collect every `links[].path`. Resolve each to an absolute path (they're
-written relative to `research-diary/index.html`, i.e. one `../` reaches
-the project root). This is your set of already-diarized files.
+collect every `links[].path`. A "Full report" link points at
+`reports/<NAME>.html` (a rendered copy, not the source -- see step 3), so
+map it back to `repo-metrics/<NAME>.md` to know which source report it
+covers. Other links resolve relative to `research-diary/index.html` (one
+`../` reaches the project root). This is your set of already-diarized
+source files.
 
 ## 2. Find candidate reports to diarize
 
@@ -57,16 +60,27 @@ is a log of *new* reports, never a re-post or update of one already there.
   If the report documents a real bug caught and fixed during its own
   validation, that's a good candidate for the optional body/notes below
   rather than a key-result bullet -- it's context, not a finding.
-- **Links**: at minimum a "Full report" link to the report itself. Add a
-  couple more only if the report clearly points at specific
-  companion artifacts worth a direct link (a methodology doc, a data
-  directory, a charts directory) -- follow the existing two posts as the
-  pattern for how many links and what they're labeled.
+- **Links**: at minimum a "Full report" link, pointed at
+  `reports/<NAME>.html` -- **never** at the `repo-metrics/<NAME>.md`
+  source directly, raw markdown doesn't render as a page in a browser. If
+  `<NAME>.html` isn't already in `render_reports.py`'s `REPORTS` dict, add
+  a `"<NAME>.md": "<NAME>.html"` entry there so `build.py` renders it
+  (source stays `repo-metrics/<NAME>.md`; you only ever read that file,
+  never edit it). Add a couple more links only if the report clearly
+  points at specific companion artifacts worth a direct link (a data
+  directory, a charts directory) -- those are relative to
+  `research-diary/index.html`, not to the post file, and point straight
+  at `repo-metrics/...` since raw data/images don't need rendering.
+  Follow the existing posts as the pattern for how many links and what
+  they're labeled.
 - Write the file with Write. Do not use Edit here -- these are new files.
 
 ## 4. Rebuild
 
-Run `python3 build.py` from inside `research-diary/`. Confirm it reports
+Run `python3 build.py` from inside `research-diary/` -- this also
+re-renders `reports/*.html` from the current `repo-metrics/*.md`, so it
+always reflects the latest report content even if a report was edited
+after its post was written. Confirm it reports
 the expected post count (previous count + number you added).
 
 ## 5. Report back

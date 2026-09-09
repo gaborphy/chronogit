@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>repo-metrics - ChronoGit Research Diary</title>
+<link rel="stylesheet" href="../vendor/bootstrap-yeti.min.css">
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand mb-0 h1" href="../index.html">&larr; ChronoGit Research Diary</a>
+    </div>
+  </nav>
+  <div class="container report-container">
+<h1 id="repo-metrics">repo-metrics</h1>
+<p>Two independent panels measuring how Python source code has changed over time
+across a sample of mature open-source projects.</p>
+<ul>
+<li><strong>Panel A</strong> (<code>output/&lt;repo&gt;_panel_a.csv</code>) — commit flow. One raw row per
+  commit touching a <code>*.py</code> file, <code>--since</code> the observation window start.
+  Never aggregated at extraction time; every rollup is done later so it can
+  be redone without re-parsing history.</li>
+<li><strong>Panel B</strong> (<code>output/&lt;repo&gt;_panel_b.csv</code>) — codebase state. One row per
+  repo-quarter, read directly from git objects (<code>git ls-tree</code> +
+  <code>git cat-file --batch</code>) for the last commit on the first-parent trunk at
+  or before each quarter end. No <code>git checkout</code> is ever run.</li>
+</ul>
+<p>Per-repo metadata (<code>output/&lt;repo&gt;_meta.json</code>) records the resolved <code>HEAD</code>
+SHA, its committer date, the extraction date (UTC), the since/until window
+used, and clone size/time — so a run is reproducible against a
+moving target.</p>
+<h2 id="running-it">Running it</h2>
+<div class="codehilite"><pre><span></span><code>python3 src/driver.py                    # full sample from src/config.py
+python3 src/driver.py --only pandas      # single repo
+</code></pre></div>
+
+<p>The driver processes repos strictly one at a time: <code>git clone --no-checkout</code>
+→ Panel A → Panel B → write CSVs + meta → <code>rm -rf</code> the clone. It is
+resumable — a repo whose <code>_panel_a.csv</code>, <code>_panel_b.csv</code>, and <code>_meta.json</code>
+all already exist in <code>output/</code> is skipped, so re-running after an
+interruption is a no-op for finished repos.</p>
+<p>Edit <code>src/config.py</code> to change <code>REPOS</code>, <code>SINCE</code>, or <code>UNTIL</code>.</p>
+<h2 id="the-file-filter-fixed-once-applies-to-both-panels">The file filter (fixed once, applies to both panels)</h2>
+<p>A <code>.py</code> path is <strong>excluded</strong> from "the codebase" if:</p>
+<ul>
+<li>any path component is one of: <code>tests</code>, <code>test</code>, <code>testing</code>, <code>doc</code>, <code>docs</code>,
+  <code>examples</code>, <code>benchmarks</code>, <code>asv_bench</code>, <code>tools</code>, <code>ci</code>, <code>scripts</code>,
+  <code>_vendor</code>, <code>vendored</code>, <code>third_party</code></li>
+<li>its basename is <code>conftest.py</code>, <code>setup.py</code>, <code>_version.py</code>, or
+  <code>versioneer.py</code></li>
+<li>its basename matches <code>test_*.py</code> or <code>*_test.py</code></li>
+</ul>
+<p>This is the "strict" rule from the brief. It is implemented once in
+<code>src/common.py::is_excluded_path</code> and imported by both panels — nothing
+downstream re-derives it. <strong>Series built under a different filter are not
+comparable to these</strong>; if you change the rule, re-run everything, don't
+patch numbers.</p>
+<p>Panel A additionally keeps <em>raw</em>, filter-independent counts on the same row
+(<code>n_files</code>, <code>added_lines</code>, <code>deleted_lines</code> — every <code>*.py</code> file the commit's
+diff touches, unfiltered) next to the <em>filtered</em> counts
+(<code>n_hunks</code>, <code>hunk_added_sum</code>, <code>added_code_*</code>, <code>added_comment_*</code>,
+<code>added_blank_lines</code> — only files that pass the rule above). That way "how
+much does the filter matter" is answerable from the CSV itself, without
+re-running git.</p>
+<h2 id="comment-boilerplate-filter">Comment boilerplate filter</h2>
+<p>A comment is dropped (not counted, in either panel) if it is:</p>
+<ul>
+<li>a shebang (<code>#!...</code>)</li>
+<li>a coding declaration (<code># -*- coding: ... -*-</code>)</li>
+<li>a tooling directive whose body starts with (case-insensitive) <code>type:</code>,
+  <code>noqa</code>, <code>pylint</code>, <code>flake8</code>, or <code>fmt:</code></li>
+</ul>
+<p>These have stable, near-constant lengths and otherwise compress the
+variance the comment-length metric is meant to capture.</p>
+<h2 id="mccabe-complexity">McCabe complexity</h2>
+<p>Per function (<code>FunctionDef</code> / <code>AsyncFunctionDef</code>), starting at 1:</p>
+<ul>
+<li><code>+1</code> for each <code>If</code>, <code>For</code>, <code>AsyncFor</code>, <code>While</code>, <code>ExceptHandler</code>, <code>Assert</code>,
+  <code>IfExp</code>, <code>With</code>, <code>AsyncWith</code></li>
+<li><code>+len(values) - 1</code> for each <code>BoolOp</code></li>
+<li><code>+1 + len(ifs)</code> per comprehension clause</li>
+<li><code>+len(cases)</code> per <code>Match</code> (3.10+; skipped on older interpreters)</li>
+</ul>
+<p>Nested function/class definitions do <strong>not</strong> contribute to their enclosing
+function's score — each nested <code>def</code> is scored separately, as its own row.</p>
+<h2 id="function-length-vs-body-length">Function length vs. body length</h2>
+<p><code>node.end_lineno - node.lineno + 1</code> includes the docstring. When
+<code>func.body[0]</code> is a bare string-literal <code>Expr</code> (a docstring), its own line
+span is subtracted out to get <code>body_len</code>; <code>docstring_len</code> is reported
+separately. <strong>Always read <code>mean_func_len</code> and <code>mean_body_len</code> together</strong> —
+they diverge, and a rise in the former without the latter is documentation
+growth, not complexity growth.</p>
+<h2 id="parse-rate">Parse rate</h2>
+<p><code>ast.parse</code> fails on Python 2 syntax (<code>print x</code>, etc.), silently for
+anything before roughly 2013–2014 depending on the project.
+<code>parsed_files / n_files</code> is reported per repo-quarter as <code>parse_rate</code>;
+AST-derived columns (complexity, function/body/docstring length) are
+computed only from files that parsed. Comment metrics come from <code>tokenize</code>,
+which is a lexer, not a parser, and survives Python 2 sources — so
+<code>mean_comment_len</code> etc. do not carry the same caveat. Treat any
+repo-quarter with <code>parse_rate &lt; 1.0</code> as indicative only.</p>
+<h2 id="partial-trailing-quarter">Partial trailing quarter</h2>
+<p>The <strong>current, still-open</strong> quarter is written to <code>output/&lt;repo&gt;_panel_b.csv</code>
+with <code>is_partial_quarter = 1</code> (its "quarter-end" snapshot is really just
+"as of extraction date") rather than dropped, since it's still a real,
+labeled data point. Any quarterly rollup built from <strong>Panel A</strong>'s raw rows
+must exclude the partial trailing quarter outright — it is short <em>and</em>
+dominated by whatever landed most recently.</p>
+<h2 id="text-decoding">Text decoding</h2>
+<p>Blob content is decoded as UTF-8 with <code>errors="replace"</code>. This is a
+simplification: it does not honor PEP 263 encoding declarations for the
+rare non-UTF-8 source file. Good enough for length/complexity metrics; not
+byte-exact.</p>
+<h2 id="author-composition">Author composition</h2>
+<p>Panel A carries <code>author</code> (git author name) on every row, so any commit-flow
+series can be rebuilt pooled, excluding the top-volume contributor, or as a
+per-quarter distinct-author count — this is a downstream rollup, not
+something the extractor decides. Panel B measures the state of the code at
+a point in time, not who wrote which line, so per-author decomposition
+does not apply to it directly; the closest available signal there is the
+Panel-A-derived contributor count for the same repo-quarter.</p>
+<h2 id="extraction-record">Extraction record</h2>
+<p>See <code>output/&lt;repo&gt;_meta.json</code> per repo for: <code>head_sha</code>,
+<code>head_committer_date</code>, <code>since</code>/<code>until</code>, <code>extraction_date_utc</code>,
+<code>clone_size_bytes</code>, <code>clone_elapsed_s</code>, and row counts for both panels.</p>
+<hr />
+<h2 id="vintage-cohort-study-separate-from-the-above">Vintage-cohort study (separate from the above)</h2>
+<p>A second, independent study (<code>src/vintage_discover.py</code> /
+<code>vintage_extract.py</code> / <code>vintage_analysis.py</code> / <code>vintage_charts.py</code>,
+findings in <code>VINTAGE_REPORT.md</code>) asks a different question: not "how has
+this fixed set of mature projects changed over time" but "how does the
+<em>starting</em> structure of newly-created packages differ depending on when
+they were born." Sample: ~10 packages per birth quarter, 2014Q1–2026Q3
+(51 quarters, 490 packages total).</p>
+<p><strong>Discovery.</strong> GitHub's search API, <code>language:Python fork:false
+created:&lt;quarter-range&gt;</code>, sorted by stars, one request per quarter
+(unauthenticated search is rate-limited to 10/min; the much stingier
+60/hour unauthenticated <em>core</em> API is deliberately never called during
+discovery). Candidates are over-fetched (25/quarter) because most
+star-ranked "Python" repos are not packages at all.</p>
+<p><strong>"Is this actually a package" check.</strong> Deferred to right after a
+<code>--no-checkout</code> clone (a local <code>git ls-tree</code>, not a GitHub API call — see
+above): requires <code>setup.py</code>, <code>pyproject.toml</code>, or <code>setup.cfg</code> at repo
+root, and at least 2 in-scope <code>.py</code> files at the measurement snapshot
+specifically (checking only at HEAD isn't enough — a snapshot from
+shortly after birth can be far sparser than the repo is today; caught
+live when <code>vinta/awesome-python</code>, a curated markdown list with 319k
+stars, passed a HEAD-only check but had exactly 1 in-scope file 180 days
+after its first commit). Of 978 candidates scanned, 358 were rejected
+purely for lacking a manifest — a majority of "language:Python, sorted by
+stars" results are not installable packages.</p>
+<p><strong>Vintage vs. actual coding start.</strong> GitHub's <code>created_at</code> is when the
+<em>repository object</em> was created, which can diverge sharply from when the
+code was actually first written — an existing project rehosted with
+preserved history (<code>googleapis/google-api-python-client</code>: GitHub says
+"created 2014Q1," git says first commit 2010, 1360 days earlier), or a
+repo slot that sat empty/was transferred before real development started
+(<code>seleniumbase/SeleniumBase</code>: "created" 2014Q1, real first commit late
+2015, 640 days later). Both directions are rejected when
+<code>|created_at − true_first_commit| &gt; 180 days</code> (78 of 490 rejections were
+this filter) — the vintage label is a package's actual git history, not
+GitHub repo metadata.</p>
+<p><strong>Snapshot timing.</strong> Each package is measured once, at its first commit
+date + 180 days (or "now" if younger — 18 of 490 packages, all from the
+most recent couple of quarters, are flagged <code>is_young_partial=1</code>), using
+the same Panel-B state extraction and a Panel-A-style flow rollup over
+just that package's pre-snapshot history. This holds <em>age</em> constant
+across cohorts rather than calendar date, so a 2014-born and a
+2025-born package are compared at the same point in their own lifecycle.</p>
+<p><em>Known git gotcha, worth restating because it's easy to reintroduce:</em>
+<code>git log --reverse --format=... -1</code> does <strong>not</strong> give the oldest commit —
+<code>-1</code> limits the (newest-first) traversal before <code>--reverse</code> reorders
+whatever survived that limit, so it silently returns HEAD's date instead.
+Confirmed live on <code>wagtail/wagtail</code> during validation (buggy command
+returned today's date; the fix — fetch the full reversed list, take the
+first line — returned the real 2014-01-22 first commit). <code>vintage_extract.py</code>
+uses the fix; <code>commit_at_or_before()</code> in <code>panel_b.py</code> is unaffected (no
+<code>--reverse</code>, different semantics).</p>
+<p><strong>Aggregation is median-based, not mean-based</strong>, unlike the calendar-time
+study: with only 7–10 packages per quarter and a handful of commits per
+young package, one outlier package dominates a mean in a way it can't
+dominate a median. <code>vintage_quarterly.csv</code> carries both, plus p25/p75.</p>
+<p><strong>Selection-bias caveat that does not apply to the calendar-time study
+above:</strong> ranking by accumulated stars is a weaker, noisier signal for
+recent quarters (less time to accumulate) than for old ones, and several
+2025–2026 candidates showed star counts implausible for their age,
+consistent with known GitHub star-inflation in the current AI-tooling
+gold rush. Metrics tied directly to popularity/reach (contributor count,
+commit count) should be read as <em>upper bounds on the most-quickly-visible
+packages of each era</em>, not as population averages — and are additionally
+confounded by GitHub's own userbase growth across 2014–2026. Code-shape
+metrics (function length, complexity, docstring rate) are one step
+removed from that confound but not immune to it either — see
+<code>VINTAGE_REPORT.md</code> for the full discussion.</p>
+  </div>
+</body>
+</html>

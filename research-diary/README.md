@@ -1,8 +1,14 @@
 # ChronoGit Research Diary
 
 A static blog of dated findings from the `repo-metrics/` studies. Open
-`index.html` in a browser (or `python3 -m http.server` from this folder)
-to read it.
+`index.html` directly in a browser, or serve it -- **from the project
+root**, not from inside this folder, since report pages link out to
+`repo-metrics/` as a sibling directory:
+
+```
+cd .. && python3 -m http.server 8000
+# then open http://localhost:8000/research-diary/
+```
 
 Styled with [Bootstrap Yeti](https://bootswatch.com/yeti/) (vendored
 locally in `vendor/`, no CDN dependency, no JS required -- the one
@@ -12,11 +18,16 @@ collapsible bit per post uses native `<details>`).
 
 ```
 research-diary/
-  posts/*.md   one file per diary entry (source of truth)
-  build.py     regenerates index.html from posts/*.md
+  posts/*.md         one file per diary entry (source of truth)
+  build.py           regenerates index.html AND reports/*.html
+  render_reports.py  converts repo-metrics/*.md -> reports/*.html (called by build.py)
   vendor/bootstrap-yeti.min.css   theme, vendored (see below to update it)
-  style.css    small overrides layered on top of the theme
-  index.html   generated -- don't hand-edit, it'll be overwritten
+  style.css          small overrides layered on top of the theme, for index.html
+  index.html         generated -- don't hand-edit, it'll be overwritten
+  reports/           generated -- rendered copies of the repo-metrics/*.md
+                     reports, so "Full report" links open a real page
+                     instead of raw markdown. Don't hand-edit; the .md
+                     files in repo-metrics/ are the source of truth.
 ```
 
 ## Adding a post by hand
@@ -38,7 +49,7 @@ key_results:
   - "Headline finding 3 (optional), quantified."
 links:
   - label: Full report
-    path: ../repo-metrics/WHATEVER_REPORT.md
+    path: reports/WHATEVER_REPORT.html   # NOT the .md -- see below
   - label: Some other relevant file
     path: ../repo-metrics/output/whatever/
 ---
@@ -48,8 +59,15 @@ abstract, a bug caught during validation. Rendered collapsed under
 "More notes" so it doesn't bulk out the post itself.
 ```
 
-Paths are relative to `research-diary/index.html` (i.e. one `../` gets you
-to the project root), not to the post file itself. Then run:
+**"Full report" links point at `reports/<NAME>.html`, never at the
+`repo-metrics/*.md` source directly** -- raw markdown doesn't render as a
+page in a browser. If the report you're linking isn't yet in
+`render_reports.py`'s `REPORTS` dict, add it there (source `.md` filename
+-> output `.html` filename); `build.py` calls it automatically so the
+rendered page and the source can't drift out of sync. Every other link
+(data files, chart directories) is relative to `research-diary/index.html`
+(i.e. one `../` gets you to the project root), not to the post file
+itself. Then run:
 
 ```
 python3 build.py

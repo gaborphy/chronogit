@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Are popular packages more likely to end up in a newborn package's dependency list? - ChronoGit Research Diary</title>
+<link rel="stylesheet" href="../vendor/bootstrap-yeti.min.css">
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand mb-0 h1" href="../index.html">&larr; ChronoGit Research Diary</a>
+    </div>
+  </nav>
+  <div class="container report-container">
+<h1 id="are-popular-packages-more-likely-to-end-up-in-a-newborn-packages-dependency-list">Are popular packages more likely to end up in a newborn package's dependency list?</h1>
+<p><strong>Hypothesis under test:</strong> a package with more stars, forks, or contributors
+is highly probably in the dependency list of a newly-created package.
+Answer, up front: <strong>yes, decisively for stars and forks, more modestly for
+contributor count</strong> — and the effect is not just "of course famous
+packages get used," it holds up against a genuine random-package baseline,
+not just against intuition.</p>
+<h2 id="method">Method</h2>
+<p>Reuses the 490 packages from the <a href="VINTAGE_REPORT.html">vintage-cohort study</a> as
+"newborn packages": for each one, its declared dependencies were parsed
+directly from the manifest at the exact same git snapshot already used to
+measure its code structure (<code>pyproject.toml</code>'s <code>[project.dependencies]</code> /
+<code>[tool.poetry.dependencies]</code>, <code>setup.py</code>'s <code>install_requires</code> — including
+the common pattern where it's a module-level variable referenced by name,
+not just an inline list — and root <code>requirements.txt</code>). This is a
+<strong>case-control design, not a description</strong>: "the dependencies people
+actually use are popular" is nearly tautological on its own (of course
+<code>requests</code> and <code>numpy</code> show up) — the real test is whether the <em>set</em> of
+packages that get used as a dependency is drawn from a more popular slice
+of the ecosystem than a package chosen at random would be. That needs a
+baseline, so alongside the dependency set this pulls a random sample of
+400 PyPI packages (sampled popularity-blind, from ecosyste.ms's default
+package ordering rather than any downloads/stars sort) to compare against.</p>
+<p>Popularity metrics (stars, forks, lifetime contributor count) come from
+<a href="https://ecosyste.ms">ecosyste.ms</a>, which mirrors GitHub repo metadata
+per PyPI package in a single API call — no GitHub API involved, so none
+of the unauthenticated-rate-limit constraints from the vintage study
+applied here (ecosyste.ms's own limit is 5,000 requests/window).
+"Contributors" = <code>repo_metadata.commit_stats.total_committers</code>, a lifetime
+count of everyone who ever committed, not a recent/active-contributor
+count.</p>
+<p><strong>Coverage:</strong> 373 of 490 newborn packages (76%) had at least one
+extractable dependency (117 had none — some legitimately ship with zero
+external dependencies this early, some declare dependencies dynamically
+in a way that can't be read without executing <code>setup.py</code>, which this
+deliberately never does). That yielded 5,231 (newborn → dependency) edges
+across 1,609 unique dependency names, of which 1,605 (99.8%) resolved to
+a real PyPI package on ecosyste.ms. All 400 baseline packages resolved.</p>
+<h2 id="result-the-dependency-set-is-a-massively-more-popular-slice-of-pypi-than-chance">Result: the dependency set is a massively more popular slice of PyPI than chance</h2>
+<p><img class="img-fluid rounded border my-3" alt="Tier breakdown" src="../../repo-metrics/output/deps/charts/tier_breakdown.png" /></p>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th>metric</th>
+<th style="text-align: right;">dependency-set median</th>
+<th style="text-align: right;">baseline median</th>
+<th style="text-align: right;">ratio</th>
+<th style="text-align: right;">Mann-Whitney p</th>
+<th style="text-align: right;">P(random dependency &gt; random baseline)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stars</td>
+<td style="text-align: right;">1,191</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;"><strong>596×</strong></td>
+<td style="text-align: right;">1.4×10⁻⁹⁵</td>
+<td style="text-align: right;">93.2%</td>
+</tr>
+<tr>
+<td>forks</td>
+<td style="text-align: right;">196</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">— (baseline median is 0)</td>
+<td style="text-align: right;">2.3×10⁻⁹¹</td>
+<td style="text-align: right;">92.2%</td>
+</tr>
+<tr>
+<td>lifetime contributors</td>
+<td style="text-align: right;">47</td>
+<td style="text-align: right;">13</td>
+<td style="text-align: right;">3.6×</td>
+<td style="text-align: right;">5.9×10⁻⁶</td>
+<td style="text-align: right;">70.1%</td>
+</tr>
+</tbody>
+</table>
+<p>The last column is the common-language effect size: pick one package used
+as a dependency and one random baseline package — that's the probability
+the dependency one has the higher value. For stars and forks that's over
+90%, about as clean a separation as this kind of ecosystem data ever
+produces. <strong>85.5% of a typical random PyPI package has 10 stars or
+fewer</strong> — that's the modal case for "a package on PyPI," not an edge case
+— while only 7.7% of used-dependencies fall in that bin; 14.2% of
+dependencies have 10,000+ stars against 0.75% of random packages.</p>
+<p><img class="img-fluid rounded border my-3" alt="Survival curves" src="../../repo-metrics/output/deps/charts/ecdf_comparison.png" /></p>
+<p>Contributors is the same direction but visibly weaker — 70% is a real,
+statistically solid effect (p = 5.9×10⁻⁶), not noise, but nowhere near the
+stars/forks separation. A plausible reading: stars and forks are largely
+driven by <em>visibility</em> (how many people have seen and reacted to the
+repo), which is exactly the kind of signal that would drive independent
+package authors toward a dependency in the first place — whereas
+lifetime-contributor-count also reflects how long a project has existed
+and how many people happened to submit even a single patch, which is a
+noisier proxy for "would a newcomer pick this."</p>
+<h2 id="being-popular-is-close-to-necessary-for-wide-adoption-but-not-sufficient">Being popular is close to necessary for wide adoption, but not sufficient</h2>
+<p><img class="img-fluid rounded border my-3" alt="Fan-in vs popularity" src="../../repo-metrics/output/deps/charts/fan_in_vs_popularity.png" /></p>
+<p>Restricting to only the packages that <em>are</em> used as a dependency, does
+being used by <em>more</em> of the 490 newborns (higher "fan-in") track with
+being <em>more</em> popular? Yes, but only moderately: Spearman ρ = 0.32 for
+stars, 0.31 for forks, 0.27 for contributors (all p &lt; 10⁻²², so the
+relationship is certainly real, just not tight). The scatter plot shows
+why: packages used by only 1 of the 490 newborns span the <em>entire</em> star
+range, from single digits to 100,000+ — a highly-starred package can
+still be a niche dependency picked up by just one or two of this specific
+sample. But high fan-in (10+ newborns depending on it) essentially never
+happens below a few hundred stars. Read together: <strong>popularity looks
+close to a necessary condition for broad adoption as a dependency, but it
+is not sufficient</strong> — a package also has to be generically useful across
+many different projects' domains, which star count alone doesn't capture.</p>
+<h2 id="the-20-most-depended-on-packages-in-this-sample">The 20 most-depended-on packages in this sample</h2>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th>package</th>
+<th style="text-align: right;">used by (of 490)</th>
+<th style="text-align: right;">stars</th>
+<th style="text-align: right;">forks</th>
+<th style="text-align: right;">lifetime contributors</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>numpy</td>
+<td style="text-align: right;">146</td>
+<td style="text-align: right;">32,629</td>
+<td style="text-align: right;">12,691</td>
+<td style="text-align: right;">1,838</td>
+</tr>
+<tr>
+<td>requests</td>
+<td style="text-align: right;">139</td>
+<td style="text-align: right;">54,279</td>
+<td style="text-align: right;">10,119</td>
+<td style="text-align: right;">742</td>
+</tr>
+<tr>
+<td>tqdm</td>
+<td style="text-align: right;">86</td>
+<td style="text-align: right;">31,300</td>
+<td style="text-align: right;">1,489</td>
+<td style="text-align: right;">120</td>
+</tr>
+<tr>
+<td>torch</td>
+<td style="text-align: right;">83</td>
+<td style="text-align: right;">102,657</td>
+<td style="text-align: right;">29,031</td>
+<td style="text-align: right;">5,024</td>
+</tr>
+<tr>
+<td>pyyaml</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">2,941</td>
+<td style="text-align: right;">601</td>
+<td style="text-align: right;">42</td>
+</tr>
+<tr>
+<td>pillow</td>
+<td style="text-align: right;">72</td>
+<td style="text-align: right;">12,226</td>
+<td style="text-align: right;">2,226</td>
+<td style="text-align: right;">491</td>
+</tr>
+<tr>
+<td>pandas</td>
+<td style="text-align: right;">62</td>
+<td style="text-align: right;">43,640</td>
+<td style="text-align: right;">17,915</td>
+<td style="text-align: right;">3,550</td>
+</tr>
+<tr>
+<td>pydantic</td>
+<td style="text-align: right;">61</td>
+<td style="text-align: right;">28,734</td>
+<td style="text-align: right;">2,931</td>
+<td style="text-align: right;">597</td>
+</tr>
+<tr>
+<td>openai</td>
+<td style="text-align: right;">56</td>
+<td style="text-align: right;">31,557</td>
+<td style="text-align: right;">5,173</td>
+<td style="text-align: right;">115</td>
+</tr>
+<tr>
+<td>six</td>
+<td style="text-align: right;">51</td>
+<td style="text-align: right;">1,028</td>
+<td style="text-align: right;">276</td>
+<td style="text-align: right;">67</td>
+</tr>
+<tr>
+<td>scipy</td>
+<td style="text-align: right;">48</td>
+<td style="text-align: right;">14,990</td>
+<td style="text-align: right;">5,909</td>
+<td style="text-align: right;">1,667</td>
+</tr>
+<tr>
+<td>python-dotenv</td>
+<td style="text-align: right;">44</td>
+<td style="text-align: right;">8,868</td>
+<td style="text-align: right;">571</td>
+<td style="text-align: right;">102</td>
+</tr>
+<tr>
+<td>matplotlib</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">23,145</td>
+<td style="text-align: right;">8,468</td>
+<td style="text-align: right;">1,730</td>
+</tr>
+<tr>
+<td>transformers</td>
+<td style="text-align: right;">42</td>
+<td style="text-align: right;">164,705</td>
+<td style="text-align: right;">34,419</td>
+<td style="text-align: right;">2,816</td>
+</tr>
+<tr>
+<td>uvicorn</td>
+<td style="text-align: right;">41</td>
+<td style="text-align: right;">10,939</td>
+<td style="text-align: right;">1,022</td>
+<td style="text-align: right;">198</td>
+</tr>
+<tr>
+<td>click</td>
+<td style="text-align: right;">40</td>
+<td style="text-align: right;">15,104</td>
+<td style="text-align: right;">1,381</td>
+<td style="text-align: right;">373</td>
+</tr>
+<tr>
+<td>httpx</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">15,459</td>
+<td style="text-align: right;">1,270</td>
+<td style="text-align: right;">241</td>
+</tr>
+<tr>
+<td>pytest</td>
+<td style="text-align: right;">39</td>
+<td style="text-align: right;">11,329</td>
+<td style="text-align: right;">2,494</td>
+<td style="text-align: right;">977</td>
+</tr>
+<tr>
+<td>tiktoken</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">19,120</td>
+<td style="text-align: right;">1,604</td>
+<td style="text-align: right;">19</td>
+</tr>
+<tr>
+<td>jinja2</td>
+<td style="text-align: right;">37</td>
+<td style="text-align: right;">11,766</td>
+<td style="text-align: right;">1,820</td>
+<td style="text-align: right;">310</td>
+</tr>
+</tbody>
+</table>
+<p>Full table: <code>output/deps/analysis/top20_most_depended_on.csv</code>. Note
+<code>pyyaml</code> and <code>six</code> sit near the bottom of this list's star counts (2,941
+and 1,028) yet rank in the top 10 by fan-in — both are exactly the
+"generically useful, low-glamour utility" case the fan-in-vs-popularity
+finding above predicts: broadly adopted despite modest visibility,
+because nearly every project needs them.</p>
+<h2 id="caveats">Caveats</h2>
+<ul>
+<li><strong>This sample is itself star-ranked at the source.</strong> The 490 newborn
+  packages were discovered by GitHub search sorted by stars (see the
+  vintage study). A newborn package that's already popular may be more
+  likely to declare fashionable, also-popular dependencies (a
+  correlated-adoption effect) rather than every dependency choice being
+  independent evidence. This report doesn't attempt to separate "popular
+  packages get chosen because they're popular" from "popular newborn
+  packages and popular dependencies both reflect the same underlying
+  trendiness" — both are consistent with the data here.</li>
+<li><strong><code>total_committers</code> is a lifetime count</strong>, not weighted by recency —
+  an old, large, but now-quiet project can out-rank an actively-growing
+  one on this metric alone.</li>
+<li><strong>The AI/LLM tooling skew in the top-20 list</strong> (<code>openai</code>, <code>transformers</code>,
+  <code>tiktoken</code>) reflects when these 490 packages were sampled and searched
+  for (2014–2026, weighted toward however GitHub's own growth distributes
+  across that window — see the vintage study's caveat on this) more than
+  it reflects the general PyPI ecosystem.</li>
+<li><strong>The baseline is popularity-blind, not usage-blind</strong> — it's a random
+  sample of <em>published</em> PyPI packages, which already excludes every
+  never-published private/internal package. The true "any package that
+  could theoretically be a dependency" universe is unmeasurable; this
+  baseline is the closest practical proxy.</li>
+</ul>
+<h2 id="data-reproducing-this">Data &amp; reproducing this</h2>
+<ul>
+<li>Dependency edges (newborn → dependency): <code>output/deps/edges.csv</code></li>
+<li>Per-newborn manifest summary (sources used, dependency count):
+  <code>output/deps/newborn_manifest_summary.csv</code></li>
+<li>Resolved popularity for every dependency: <code>output/deps/dependency_popularity.csv</code></li>
+<li>Random baseline sample: <code>output/deps/baseline_popularity.csv</code></li>
+<li>Case-control test, fan-in correlation, tier breakdowns, top-20 table:
+  <code>output/deps/analysis/*.csv</code></li>
+<li>Regenerate: <code>python3 src/deps_extract.py &amp;&amp; python3 src/deps_popularity.py
+  &amp;&amp; python3 src/deps_analysis.py &amp;&amp; python3 src/deps_charts.py</code></li>
+</ul>
+  </div>
+</body>
+</html>
