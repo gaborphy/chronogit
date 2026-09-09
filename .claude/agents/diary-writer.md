@@ -42,17 +42,21 @@ is a log of *new* reports, never a re-post or update of one already there.
   kebab-case handle for the topic, not the literal title).
 - **Title**: the report's own H1, or a close rephrasing if the H1 isn't
   usable standalone as a title.
-- **Summary**: 3-6 sentences, written entirely from what the report itself
-  says -- pull real numbers and claims, don't paraphrase into vaguer or
-  stronger language than the source. Match the existing posts' voice:
-  quantified, direct, explicit about what's robust vs. a single-sample
-  artifact vs. a caveat/confound, no hype, no false certainty. If the
-  report calls a finding "suggestive, not proven" or flags something as
-  noisy, the summary must carry that same hedge -- don't launder caveats
-  out for a punchier sentence.
+- **Abstract**: one or two sentences of framing only -- what was measured,
+  on what sample. No findings here; that's what `key_results` is for.
+- **Key results**: a list of 2-3 headline findings, each one sentence,
+  written entirely from what the report itself says -- pull real numbers
+  and claims, don't paraphrase into vaguer or stronger language than the
+  source. Match the existing posts' voice: quantified, direct, explicit
+  about what's robust vs. a single-sample artifact vs. a caveat/confound,
+  no hype, no false certainty. If the report calls a finding "suggestive,
+  not proven" or flags something as noisy, the bullet must carry that same
+  hedge -- don't launder caveats out for a punchier sentence. Pick the
+  2-3 findings the report itself treats as the headline, not just the
+  first ones mentioned.
   If the report documents a real bug caught and fixed during its own
-  validation (the existing posts both do this), include it briefly --
-  that's exactly the kind of detail this diary exists to preserve.
+  validation, that's a good candidate for the optional body/notes below
+  rather than a key-result bullet -- it's context, not a finding.
 - **Links**: at minimum a "Full report" link to the report itself. Add a
   couple more only if the report clearly points at specific
   companion artifacts worth a direct link (a methodology doc, a data
@@ -82,5 +86,5 @@ additional analysis.
 - **Never touch files outside `research-diary/`.** You read `repo-metrics/`
   reports; you don't modify them.
 - **Never fabricate a finding, number, or caveat that isn't in the source
-  report.** If a report is ambiguous or you're not confident in a summary
-  point, leave it out rather than guessing.
+  report.** If a report is ambiguous or you're not confident in an
+  abstract or key-result point, leave it out rather than guessing.

@@ -1,22 +1,15 @@
 ---
 title: "Do newly-created packages look different depending on when they were born?"
 date: 2026-09-08T23:15:01+02:00
-summary: >
+abstract: >
   Sampled ~10 new Python packages per birth quarter from GitHub search,
-  2014Q1-2026Q3 (490 packages total, 96% fill rate), and measured each one
-  once at ~180 days old so different eras are compared at the same point in
-  a package's life. Function length and complexity grew far more for
-  newly-founded packages (+137% / +73%, 2014-15 cohorts vs 2024-26 cohorts)
-  than the same metrics did for the mature, tracked-over-time repos in the
-  calendar-time study (+25% / +4.7%) -- most of the "code got bigger"
-  signal is in what gets founded now, not in how existing projects evolved.
-  Comment length stayed flat here too, independently confirming the
-  calendar-time study's strongest result. Docstring rate shows a sharp,
-  untrended jump starting 2024Q4 -- timing consistent with mainstream
-  AI-coding-assistant adoption, flagged as suggestive rather than proven.
-  Contributor/commit-count growth is called out explicitly as likely
-  dominated by GitHub's own userbase growth and star-inflation in recent
-  candidates, not a code-writing-style finding.
+  2014Q1-2026Q3 (490 packages, 96% fill rate), and measured each one once
+  at ~180 days old so different eras are compared at the same point in a
+  package's life, not the same calendar date.
+key_results:
+  - "Function length and complexity grew far more for newly-founded packages (+137% / +73%, 2014-15 vs 2024-26 cohorts) than for the mature, tracked-over-time repos in the calendar-time study (+25% / +4.7%) -- most of the \"code got bigger\" signal is in what gets founded now, not in how existing projects evolved."
+  - "Comment length stayed flat here too, independently confirming the calendar-time study's strongest result."
+  - "Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven."
 links:
   - label: Full report
     path: ../repo-metrics/VINTAGE_REPORT.md

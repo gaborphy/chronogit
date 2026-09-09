@@ -4,21 +4,38 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChronoGit Research Diary</title>
+<link rel="stylesheet" href="vendor/bootstrap-yeti.min.css">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>ChronoGit Research Diary</h1>
-    <p class="tagline">Dated notes on the repo-metrics studies -- what was measured, what held up, what didn't.</p>
-  </header>
-  <main>
-    <article class="post">
-      <div class="meta">
-        <time datetime="2026-09-09T07:59:38+02:00">September 9, 2026</time>
-      </div>
-      <h2>Are popular packages more likely to end up in a newborn package&#x27;s dependency list?</h2>
-      <p class="summary">Tested this as a case-control comparison, not just a description: parsed declared dependencies for the 490 vintage-cohort newborn packages (373 had at least one, 5,231 edges to 1,609 unique packages, 99.8% resolved on PyPI), then compared their stars/forks/lifetime-contributor-count against a popularity-blind random sample of 400 PyPI packages. Decisive for stars and forks: dependency-set median is 1,191 stars vs 2 for a random package (596x, Mann-Whitney p=1.4e-95) -- a random used-dependency beats a random baseline package on stars 93% of the time. Real but much weaker for lifetime contributors (3.6x, p=5.9e-6, 70% effect size), plausibly because contributor count also reflects project age/size and not just visibility. Within the dependency set alone, being depended on by *more* of the 490 newborns correlates only moderately with popularity (Spearman ~0.3) -- popularity looks close to necessary for broad adoption as a dependency but isn&#x27;t sufficient; pyyaml and six rank top-10 by fan-in despite modest star counts because they&#x27;re generically useful regardless of fame.</p>
-      <p>Caveat carried over directly from the report: the 490-package sample is
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <span class="navbar-brand mb-0 h1">ChronoGit Research Diary</span>
+    </div>
+  </nav>
+  <div class="container">
+    <p class="tagline text-muted mb-4">Dated notes on the repo-metrics studies -- what was measured, what held up, what didn't.</p>
+    <main>
+    <article class="card post-card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="post-meta">
+          <time datetime="2026-09-09T07:59:38+02:00">September 9, 2026</time>
+        </div>
+        <h2 class="card-title h4">Are popular packages more likely to end up in a newborn package&#x27;s dependency list?</h2>
+        <p class="abstract">Tested this as a case-control comparison, not just a description: parsed declared dependencies for the 490 vintage-cohort newborn packages (373 had at least one, 5,231 edges to 1,609 unique packages) and compared their popularity against a popularity-blind random sample of 400 PyPI packages.</p>
+        <ul class="key-results">
+          <li>Decisive for stars and forks: dependency-set median is 1,191 stars vs 2 for a random package (596x, Mann-Whitney p=1.4e-95) -- a random used-dependency beats a random baseline package on stars 93% of the time.</li>
+          <li>Real but much weaker for lifetime contributors (3.6x, p=5.9e-6, 70% effect size) -- plausibly because contributor count also reflects project age/size, not just visibility.</li>
+          <li>Within the dependency set, being depended on by more of the 490 newborns correlates only moderately with popularity (Spearman ~0.3) -- popularity looks close to necessary for broad adoption but isn&#x27;t sufficient (pyyaml, six rank top-10 by fan-in despite modest star counts).</li>
+        </ul>
+        <div class="link-row">
+          <a href="../repo-metrics/DEPENDENCY_REPORT.md" class="btn btn-sm btn-outline-primary">Full report</a>
+          <a href="../repo-metrics/output/deps/" class="btn btn-sm btn-outline-primary">Dependency edges &amp; resolved popularity data</a>
+          <a href="../repo-metrics/output/deps/charts/" class="btn btn-sm btn-outline-primary">Charts</a>
+        </div>
+        <details class="notes">
+          <summary>More notes</summary>
+          <p>Caveat carried over directly from the report: the 490-package sample is
 itself star-ranked at the source (see the vintage-cohort post), so this
 can&#x27;t cleanly separate &quot;popular packages get chosen because they&#x27;re
 popular&quot; from &quot;trendy new packages and trendy dependencies both move
@@ -27,20 +44,32 @@ together.&quot; The <code>setup.py</code> parser also had to handle the common
 inline literal list passed straight to <code>setup()</code>) to avoid under-counting
 dependencies -- same AST-literal-only discipline as the rest of this
 project, no code execution involved.</p>
-      <ul class="links">
-        <li><a href="../repo-metrics/DEPENDENCY_REPORT.md">Full report</a></li>
-        <li><a href="../repo-metrics/output/deps/">Dependency edges &amp; resolved popularity data</a></li>
-        <li><a href="../repo-metrics/output/deps/charts/">Charts</a></li>
-      </ul>
+        </details>
+      </div>
     </article>
 
-    <article class="post">
-      <div class="meta">
-        <time datetime="2026-09-08T23:15:01+02:00">September 8, 2026</time>
-      </div>
-      <h2>Do newly-created packages look different depending on when they were born?</h2>
-      <p class="summary">Sampled ~10 new Python packages per birth quarter from GitHub search, 2014Q1-2026Q3 (490 packages total, 96% fill rate), and measured each one once at ~180 days old so different eras are compared at the same point in a package&#x27;s life. Function length and complexity grew far more for newly-founded packages (+137% / +73%, 2014-15 cohorts vs 2024-26 cohorts) than the same metrics did for the mature, tracked-over-time repos in the calendar-time study (+25% / +4.7%) -- most of the &quot;code got bigger&quot; signal is in what gets founded now, not in how existing projects evolved. Comment length stayed flat here too, independently confirming the calendar-time study&#x27;s strongest result. Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven. Contributor/commit-count growth is called out explicitly as likely dominated by GitHub&#x27;s own userbase growth and star-inflation in recent candidates, not a code-writing-style finding.</p>
-      <p>Two real bugs were caught and fixed during single-quarter validation before
+    <article class="card post-card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="post-meta">
+          <time datetime="2026-09-08T23:15:01+02:00">September 8, 2026</time>
+        </div>
+        <h2 class="card-title h4">Do newly-created packages look different depending on when they were born?</h2>
+        <p class="abstract">Sampled ~10 new Python packages per birth quarter from GitHub search, 2014Q1-2026Q3 (490 packages, 96% fill rate), and measured each one once at ~180 days old so different eras are compared at the same point in a package&#x27;s life, not the same calendar date.</p>
+        <ul class="key-results">
+          <li>Function length and complexity grew far more for newly-founded packages (+137% / +73%, 2014-15 vs 2024-26 cohorts) than for the mature, tracked-over-time repos in the calendar-time study (+25% / +4.7%) -- most of the &quot;code got bigger&quot; signal is in what gets founded now, not in how existing projects evolved.</li>
+          <li>Comment length stayed flat here too, independently confirming the calendar-time study&#x27;s strongest result.</li>
+          <li>Docstring rate shows a sharp, untrended jump starting 2024Q4 -- timing consistent with mainstream AI-coding-assistant adoption, flagged as suggestive rather than proven.</li>
+        </ul>
+        <div class="link-row">
+          <a href="../repo-metrics/VINTAGE_REPORT.md" class="btn btn-sm btn-outline-primary">Full report</a>
+          <a href="../repo-metrics/README.md" class="btn btn-sm btn-outline-primary">Methodology &amp; pipeline caveats</a>
+          <a href="../repo-metrics/output/vintage/packages.csv" class="btn btn-sm btn-outline-primary">Per-package data</a>
+          <a href="../repo-metrics/output/vintage/analysis/" class="btn btn-sm btn-outline-primary">Cohort-quarter aggregates</a>
+          <a href="../repo-metrics/output/vintage/charts/" class="btn btn-sm btn-outline-primary">Charts</a>
+        </div>
+        <details class="notes">
+          <summary>More notes</summary>
+          <p>Two real bugs were caught and fixed during single-quarter validation before
 committing to the full 51-quarter run, both documented in the report:
 <code>git log --reverse ... -1</code> silently returns HEAD&#x27;s date instead of the
 oldest commit&#x27;s (confirmed live on wagtail/wagtail), and a repo&#x27;s
@@ -52,38 +81,43 @@ rejecting candidates where GitHub&#x27;s <code>created_at</code> diverges more t
 days from the git history&#x27;s true first commit, catching cases like
 <code>google-api-python-client</code> (GitHub says &quot;created 2014,&quot; real first commit
 is from 2010).</p>
-      <ul class="links">
-        <li><a href="../repo-metrics/VINTAGE_REPORT.md">Full report</a></li>
-        <li><a href="../repo-metrics/README.md">Methodology &amp; pipeline caveats</a></li>
-        <li><a href="../repo-metrics/output/vintage/packages.csv">Per-package data</a></li>
-        <li><a href="../repo-metrics/output/vintage/analysis/">Cohort-quarter aggregates</a></li>
-        <li><a href="../repo-metrics/output/vintage/charts/">Charts</a></li>
-      </ul>
+        </details>
+      </div>
     </article>
 
-    <article class="post">
-      <div class="meta">
-        <time datetime="2026-09-08T19:30:18+02:00">September 8, 2026</time>
+    <article class="card post-card shadow-sm mb-4">
+      <div class="card-body">
+        <div class="post-meta">
+          <time datetime="2026-09-08T19:30:18+02:00">September 8, 2026</time>
+        </div>
+        <h2 class="card-title h4">How has Python source code changed since 2014?</h2>
+        <p class="abstract">Tracked pandas, numpy, scipy, scikit-learn, matplotlib, django, sqlalchemy, sympy, ipython, and pytest across 12 years (2014-2026) on two independent panels: raw commit flow and quarterly codebase-state snapshots.</p>
+        <ul class="key-results">
+          <li>Function length grew faster than function-body length everywhere (docstrings, not logic, drove about a third of the apparent growth) -- confirmed panel-wide, not just in pandas.</li>
+          <li>Median added-lines-per-hunk stayed completely flat across all 10 repos and 12 years while lines-per-commit rose 44% -- growth came from bundling more hunks per commit, not bigger edits.</li>
+          <li>An event-study scan for a discrete break at four candidate dates (including the Nov 2022 ChatGPT release) found none that survives correcting for each repo&#x27;s own pre-existing trend; sympy&#x27;s dramatic-looking complexity swings turned out to be a function-count composition artifact, not a code-complexity story.</li>
+        </ul>
+        <div class="link-row">
+          <a href="../repo-metrics/REPORT.md" class="btn btn-sm btn-outline-primary">Full report</a>
+          <a href="../repo-metrics/README.md" class="btn btn-sm btn-outline-primary">Methodology &amp; file-filter rules</a>
+          <a href="../repo-metrics/output/" class="btn btn-sm btn-outline-primary">Raw panel data (per repo)</a>
+          <a href="../repo-metrics/output/analysis/" class="btn btn-sm btn-outline-primary">Aggregated quarterly series</a>
+          <a href="../repo-metrics/output/charts/" class="btn btn-sm btn-outline-primary">Charts</a>
+        </div>
+        <details class="notes">
+          <summary>More notes</summary>
+          <p>Full writeup, charts, and the robust-vs-single-repo-artifact breakdown are
+in the linked report, including the event-study methodology and the
+author-controlled decomposition (sqlalchemy&#x27;s top contributor made 71% of
+all commits in-window; pandas reproduces the &quot;one dominant contributor
+skews a single quarter&quot; pitfall almost exactly in 2026Q2).</p>
+        </details>
       </div>
-      <h2>How has Python source code changed since 2014?</h2>
-      <p class="summary">Tracked pandas, numpy, scipy, scikit-learn, matplotlib, django, sqlalchemy, sympy, ipython, and pytest across 12 years (2014-2026) on two independent panels: raw commit flow and quarterly codebase-state snapshots. Function length grew faster than function-body length everywhere (docstrings, not logic, drove a third of the apparent growth) -- confirmed panel-wide, not just in pandas. Median added-lines-per-hunk stayed completely flat across all 10 repos and 12 years while lines-per-commit rose 44% -- growth came from bundling more hunks per commit, not bigger edits. An event-study scan for a discrete break at four candidate dates (including the Nov 2022 ChatGPT release) found none that survives correcting for each repo&#x27;s own pre-existing trend -- sympy&#x27;s dramatic-looking complexity swings turned out to be a module-addition/removal artifact in its function count, not a code-complexity story.</p>
-      <p>Full writeup, charts, and the robust-vs-single-repo-artifact breakdown are
-in the linked report. Headline numbers only here; see the report for the
-event-study methodology and the author-controlled decomposition
-(sqlalchemy&#x27;s top contributor made 71% of all commits in-window; pandas
-reproduces the &quot;one dominant contributor skews a single quarter&quot; pitfall
-almost exactly in 2026Q2).</p>
-      <ul class="links">
-        <li><a href="../repo-metrics/REPORT.md">Full report</a></li>
-        <li><a href="../repo-metrics/README.md">Methodology &amp; file-filter rules</a></li>
-        <li><a href="../repo-metrics/output/">Raw panel data (per repo)</a></li>
-        <li><a href="../repo-metrics/output/analysis/">Aggregated quarterly series</a></li>
-        <li><a href="../repo-metrics/output/charts/">Charts</a></li>
-      </ul>
     </article>
-  </main>
-  <footer>
-    <p>Generated by <code>research-diary/build.py</code> from <code>posts/*.md</code>. 3 entries.</p>
-  </footer>
+    </main>
+    <footer class="text-muted small py-4">
+      <p>Generated by <code>research-diary/build.py</code> from <code>posts/*.md</code>. 3 entries.</p>
+    </footer>
+  </div>
 </body>
 </html>
