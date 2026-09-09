@@ -1,0 +1,8 @@
+quarter,n_pkgs_flagged,n_pkgs_nonflagged,stargazers_count_flagged_median,stargazers_count_nonflagged_median,stargazers_count_diff,forks_count_flagged_median,forks_count_nonflagged_median,forks_count_diff,total_committers_flagged_median,total_committers_nonflagged_median,total_committers_diff
+2025Q1,8,20,8772.0,9839.0,-1067.0,972.0,1037.0,-65.0,120.0,129.0,-9.0
+2025Q2,14,14,9839.0,9866.0,-27.0,1022.0,1237.0,-215.0,164.0,185.0,-21.0
+2025Q3,16,10,9839.0,3925.5,5913.5,1022.0,450.0,572.0,193.0,101.0,92.0
+2025Q4,19,8,3985.5,7795.0,-3809.5,603.0,801.5,-198.5,101.0,120.0,-19.0
+2026Q1,21,5,7619.0,4673.5,2945.5,972.0,709.5,262.5,115.0,135.0,-20.0
+2026Q2,17,7,7582.5,11329.0,-3746.5,832.0,1219.0,-387.0,115.0,106.0,9.0
+2026Q3,17,10,10378.5,11134.0,-755.5,1022.0,1500.0,-478.0,120.0,194.0,-74.0

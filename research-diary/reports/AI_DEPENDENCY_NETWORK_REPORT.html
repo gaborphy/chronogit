@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Do AI-authored packages build dependency networks differently? - ChronoGit Research Diary</title>
+<link rel="stylesheet" href="../vendor/bootstrap-yeti.min.css">
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand mb-0 h1" href="../index.html">&larr; ChronoGit Research Diary</a>
+    </div>
+  </nav>
+  <div class="container report-container">
+<h1 id="do-ai-authored-packages-build-dependency-networks-differently">Do AI-authored packages build dependency networks differently?</h1>
+<p><strong>Hypothesis under test:</strong> the dependency network of fresh, AI-usage-proven
+packages is evolving in a different way than otherwise-comparable
+non-AI-flagged ones. Answer, up front: <strong>the part of this that looked
+true doesn't survive a basic confound check, and the part that's real
+isn't what the hypothesis predicted.</strong> AI-flagged packages do not depend
+on more-popular or more-concentrated packages than non-flagged ones once
+calendar time is controlled for — but they do depend on visibly
+<em>different specific packages</em>, reflecting what kind of software gets
+built with AI assistance right now more than how AI assistance changes
+dependency choice in general.</p>
+<p>This report is a direct extension of <a href="DEPENDENCY_REPORT.html">DEPENDENCY_REPORT.md</a>
+and <a href="AI_USAGE_REPORT.html">AI_USAGE_REPORT.md</a>, triggered by a session
+spent understanding an external academic project,
+<a href="#connection-to-cl_ecosystem_networks">cl_ecosystem_networks</a> (npm/PyPI/CRAN
+dependency-network growth at multi-million-node scale), whose own authors
+flag exactly this question — "decompose the post-2022 densification
+effect by actual AI involvement" — as unfinished future work they have no
+package-level ground truth to attempt. This project's <code>AI_USAGE_REPORT.md</code>
+has exactly that ground truth, at a much smaller scale; this report is
+the first attempt to point it at that question.</p>
+<h2 id="method">Method</h2>
+<p>Reuses <code>output/deps/edges.csv</code> (14,832 newborn-package → dependency
+edges) joined against <code>output/ai_signal/ai_signals.csv</code>'s <code>has_signal</code>
+flag (the same self-disclosed commit-trailer / config-file evidence from
+AI_USAGE_REPORT.md — a floor on true AI-tool usage, not an estimate of
+it; see that report for the full caveat). Restricted throughout to
+packages born <strong>2024 or later</strong>: self-disclosed AI usage is ~0% before
+2024, so including 2014–2023 would just reproduce the calendar-time
+trend already documented in DEPENDENCY_REPORT.md's time-dimension
+section, not test anything about AI specifically.</p>
+<p><strong>A confound had to be caught and handled before anything else.</strong> Within
+2024–2026, "AI-flagged" and "later quarter" are nearly the same variable:
+2024Q1 has 0 of 30 packages flagged; 2026Q1 has 25 of 30. A pooled
+comparison across the whole window would mostly measure the already-known
+rising-popularity-over-time trend, not an AI effect. Two views are
+reported for exactly this reason:</p>
+<ol>
+<li><strong>Naive pooled 2024–2026</strong> — shown for transparency, explicitly
+   labeled confounded, not trusted as an answer on its own.</li>
+<li><strong>Stratified by quarter, 2025Q1–2026Q3</strong> (the 7 quarters with a
+   usable number of packages in <em>both</em> groups — ≥3 packages/group):
+   compute the AI-flagged-vs-non-flagged difference <em>within</em> each
+   quarter separately, then test whether the direction is consistent
+   across quarters with a Wilcoxon signed-rank test on the paired
+   per-quarter differences. This is the deconfounded test.</li>
+</ol>
+<p>296 packages fall in the 2024–2026 window (139 flagged, 191 non-flagged),
+yielding 6,064 edges.</p>
+<h2 id="the-naive-result-looks-real-it-isnt">The naive result looks real. It isn't.</h2>
+<p><img class="img-fluid rounded border my-3" alt="Naive vs stratified" src="../../repo-metrics/output/deps/charts_ai_comparison/naive_vs_stratified.png" /></p>
+<p>Pooled across 2024–2026, AI-flagged packages' dependencies have a higher
+median star count (7,848 vs. 5,706, a 1.38× ratio) with a nominally
+significant Mann-Whitney p = 0.029. Read on its own, that's exactly what
+the hypothesis predicts and exactly the kind of number that's tempting to
+report as the finding.</p>
+<p><strong>It's a time-confound artifact.</strong> Stratified by quarter, the Wilcoxon
+signed-rank test on the paired differences gives p = 0.69 for stars and
+p = 0.69 for forks (p = 0.41 for lifetime contributors) — nowhere close
+to significant. More tellingly, the <em>direction</em> isn't even consistent:
+AI-flagged packages have <strong>lower</strong> median star dependencies in 5 of the 7
+stratified quarters, not higher (2025Q1: −1,067; 2025Q2: −27; 2025Q4:
+−3,810; 2026Q2: −3,747; 2026Q3: −756 — only 2025Q3 and 2026Q1 go the
+other way, and by large margins that don't repeat). The naive pooled
+"effect" was almost entirely 2024's near-zero flagged sample and 2026's
+near-total flagged sample producing a spurious calendar-time correlation,
+not a real AI-vs-non-AI difference. <strong>Once deconfounded, there is no
+evidence that AI-flagged packages depend on more, less, or differently
+positioned popularity than comparable non-flagged packages.</strong></p>
+<h2 id="dependency-breadth-no-robust-difference-either">Dependency breadth: no robust difference either</h2>
+<p>Naive comparison suggested AI-flagged packages declare noticeably fewer
+dependencies (median 10 vs. 13 for non-flagged). Restricted to the
+same stratified 2025Q1–2026Q3 window, that gap nearly vanishes (10 vs.
+9.5) — another naive signal that mostly reflects calendar time, not an
+AI effect. One difference that <em>is</em> stable across both views: AI-flagged
+packages show a higher rate of zero extractable dependencies (12.5–13.0%
+vs. 8.4–9.8%). This could be a real effect (self-contained scaffolding
+AI tools tend to generate) or a measurement artifact — this project's
+dependency parser only reads literal <code>install_requires</code> lists,
+<code>pyproject.toml</code> tables, and <code>requirements.txt</code> (see DEPENDENCY_REPORT.md's
+method section); if AI-generated manifests favor a declaration pattern
+this parser doesn't handle, that would show up as a false zero. Not
+resolved here.</p>
+<h2 id="whats-actually-different-which-packages-not-how-many-or-how-popular">What's actually different: which packages, not how many or how popular</h2>
+<p><img class="img-fluid rounded border my-3" alt="Top-20 overlap" src="../../repo-metrics/output/deps/charts_ai_comparison/top20_overlap.png" /></p>
+<p>Comparing the 20 most-depended-on packages in each group (stratified
+window), the overlap is moderate — Jaccard similarity 0.38, 11 of 20
+shared — but the <em>non-overlapping</em> halves tell a clear, coherent story.
+<strong>AI-flagged-only</strong>: <code>anthropic</code>, <code>mcp</code> (the Model Context Protocol),
+<code>tiktoken</code>, plus <code>click</code>, <code>typer</code>, <code>rich</code>, <code>httpx</code>, <code>websockets</code>,
+<code>tenacity</code> — an LLM-agent-and-API-client-tooling cluster: the SDKs and
+CLI/networking scaffolding you'd reach for building an AI agent or
+wrapping an API. <strong>Non-flagged-only</strong>: <code>accelerate</code>, <code>einops</code>, <code>gradio</code>,
+<code>huggingface-hub</code>, <code>opencv-python</code>, <code>pandas</code>, <code>torchaudio</code>,
+<code>torchvision</code> — a classic ML-research-and-computer-vision cluster: the
+PyTorch/HuggingFace ecosystem for training and evaluating models. The
+shared middle ground (<code>numpy</code>, <code>torch</code>, <code>transformers</code>, <code>fastapi</code>,
+<code>pydantic</code>, <code>requests</code>, <code>uvicorn</code>, <code>openai</code>) is the common infrastructure
+both kinds of project need regardless of how they were written.</p>
+<p><strong>This is a compositional difference, not a structural one, and the
+distinction matters for how to read the whole report.</strong> The original
+hypothesis was framed as the dependency <em>network</em> evolving differently —
+implying something about graph shape, concentration, or growth dynamics.
+What this data actually shows is that AI-flagged and non-flagged
+packages tend to be <strong>different kinds of software</strong> (agent/API tooling
+vs. ML/CV research tooling), each pulling in the ecosystem-standard
+dependencies for its own kind — not that AI authorship changes how a
+comparable piece of software picks its dependencies. That's a real,
+interesting finding, but it's a different claim than the one under test,
+and this report is explicit about not overstating it as confirmation of
+the original hypothesis.</p>
+<p><strong>A specific, unresolved confound worth naming directly</strong>: a package
+being AI-flagged and a package being LLM/agent-topic software are
+plausibly the same underlying thing wearing two hats — someone building
+an agent framework today is more likely to reach for Claude Code <em>and</em>
+more likely to import <code>anthropic</code>/<code>mcp</code>. This report cannot separate "AI
+tools cause agent-flavored dependency choices" from "people building
+agent-flavored software right now also happen to be the people using AI
+coding tools right now" — both produce the same observed pattern, and
+untangling them would need a control group of AI-flagged non-agent
+software, which this sample doesn't have enough of.</p>
+<h2 id="connection-to-cl_ecosystem_networks">Connection to cl_ecosystem_networks</h2>
+<p><code>cl_ecosystem_networks</code> (a separate academic project, local at
+<code>~/Documents_alt/Research/cl_ecosystem_networks/</code>, not part of this
+project and explored read-only) studies npm/PyPI/CRAN dependency-network
+growth from
+2000–2026 using ecosyste.ms's full bulk data release — multiple orders
+of magnitude larger than this project's sample, with three formal
+generative network models fitted against an empirical <strong>densification</strong>
+finding (edge count growing faster than node count). Their own pipeline
+already ran a structural-break test for the ChatGPT release date on the
+whole-ecosystem densification curve (Chow test, <code>ai_breakpoint_analysis.py</code>):
+npm shows a large but fragile break (p = 0.0001 at that specific date,
+but not independently found by an unconstrained break search), PyPI
+shows a clean null, CRAN's result contradicts its own decelerating
+release cadence. Their own written synthesis names, as unattempted future
+work, exactly this report's question — separating packages with genuine
+AI involvement from the rest of the post-2022 aggregate signal — because
+they have no package-level ground truth for which packages that is.</p>
+<p>This report is a first, small-scale attempt at that decomposition, and
+the honest result is a null on the structural/popularity axis their
+model-fitting apparatus would care about most, plus a real compositional
+signal their aggregate curves can't see at all. Two things worth stating
+plainly about scale: this project's 139 AI-flagged packages are two to
+three orders of magnitude smaller than what their sup-F/Chow/copying-model
+machinery was built and validated on — not enough to refit their formal
+models or rerun a proper break search on an AI-flagged sub-network — and
+this project's single-snapshot-per-package design has no longitudinal
+per-package edge history, which their data does. A genuine next step
+(unattempted here) would use their full population of newborn PyPI
+packages by quarter — removing this project's GitHub-star sampling bias
+entirely — as the base population for this project's AI-signal scan,
+which is the point where each project's respective weak spot gets fixed
+by the other's data.</p>
+<h2 id="caveats">Caveats</h2>
+<ul>
+<li><strong>Confound discipline applies to every number in this report, not just
+  the headline one</strong> — see the naive-vs-stratified sections above for
+  why every comparison here is shown both ways.</li>
+<li><strong><code>has_signal</code> is the same floor-not-estimate measure from
+  AI_USAGE_REPORT.md.</strong> False negatives (real AI usage with no visible
+  trace) are expected to be common; this report inherits that limitation
+  fully.</li>
+<li><strong>The stratified test has real power limits of its own</strong> — 7 quarters,
+  with per-quarter group sizes as low as 3–8 packages. A null result here
+  is evidence of no <em>large, consistent</em> effect, not proof of exactly
+  zero effect.</li>
+<li><strong>The agent-vs-ML-research compositional split is read from a top-20
+  list, not tested statistically.</strong> A formal topic-classification pass
+  would be needed to confirm it holds beyond the specific packages named
+  here.</li>
+</ul>
+<h2 id="data-reproducing-this">Data &amp; reproducing this</h2>
+<ul>
+<li>Naive and stratified comparison tables: <code>output/deps/analysis_ai_comparison/*.csv</code></li>
+<li>Top-20 overlap detail: <code>output/deps/analysis_ai_comparison/top20_overlap.json</code></li>
+<li>Charts: <code>output/deps/charts_ai_comparison/</code></li>
+<li>Regenerate: <code>python3 src/ai_dependency_comparison.py &amp;&amp; python3
+  src/ai_dependency_comparison_charts.py</code> (requires <code>output/deps/edges.csv</code>,
+  <code>output/deps/dependency_popularity.csv</code>, and <code>output/ai_signal/ai_signals.csv</code>
+  from the earlier studies)</li>
+</ul>
+  </div>
+</body>
+</html>

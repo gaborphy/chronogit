@@ -1,0 +1,4 @@
+metric,n_quarters,n_quarters_ai_higher,n_quarters_ai_lower,median_diff,wilcoxon_p
+stargazers_count,7,2,5,-755.5,0.6875
+forks_count,7,2,5,-198.5,0.6875
+total_committers,7,2,5,-19.0,0.40625

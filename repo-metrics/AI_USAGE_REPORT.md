@@ -145,10 +145,12 @@ Full table: `output/ai_signal/analysis/top15_ai_attributed.csv`.
   (packages converging on the same popular dependencies) did **not**
   hold up once corrected for sample size. Rising AI-tool usage and flat
   dependency concentration can both be true at once — this report
-  doesn't reconcile them further; a real answer would need to check
-  whether AI-tool-flagged packages specifically show different
-  dependency-concentration behavior than non-flagged ones in the same
-  cohort, which isn't done here.
+  doesn't reconcile them further on its own. **[AI_DEPENDENCY_NETWORK_REPORT.md](AI_DEPENDENCY_NETWORK_REPORT.md)
+  does exactly this check** — whether AI-flagged packages specifically
+  show different dependency behavior than non-flagged ones in the same
+  cohort — and finds no robust popularity/concentration difference once
+  properly deconfounded from calendar time, but a real compositional
+  difference in *which* packages get depended on.
 - **2026 is a partial year** on a smaller sample (90 vs. 120 packages) —
   treat the 73.3% figure as directional, not a stable annual rate.
 

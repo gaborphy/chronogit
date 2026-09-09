@@ -268,7 +268,13 @@ self-disclosed AI-tool usage climbing from ~0% (pre-2022) to 73% of the
 (partial) 2026 cohort, overtaking AI-SDK topic dependence as the dominant
 signal by 2025. It's a floor, not a full measurement (most AI-assisted
 commits leave no trace at all), but it's direct evidence rather than an
-inference from what a package imports.
+inference from what a package imports. **[AI_DEPENDENCY_NETWORK_REPORT.md](AI_DEPENDENCY_NETWORK_REPORT.md)**
+combines the two — comparing this report's dependency edges directly
+against that self-disclosure flag, properly deconfounded from calendar
+time — and finds AI-flagged packages don't depend on more popular or more
+concentrated dependencies than non-flagged ones, but do depend on
+visibly different *specific* packages (LLM-agent tooling vs. classic
+ML-research tooling), a compositional rather than structural difference.
 
 ## Caveats
 

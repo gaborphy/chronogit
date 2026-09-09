@@ -1,0 +1,4 @@
+metric,ai_flagged_median,non_flagged_median,ai_flagged_n,non_flagged_n,mannwhitney_p,common_language_effect_size
+stargazers_count,7848.0,5706.5,2115,3678,0.029358862188532193,0.5171637119053036
+forks_count,920.0,806.0,2115,3678,0.38982204623478245,0.5067748043764149
+total_committers,120.0,115.0,1897,3380,0.971247536340208,0.5002985873053997
