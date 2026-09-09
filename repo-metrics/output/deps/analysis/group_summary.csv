@@ -1,0 +1,7 @@
+group,metric,n,mean,median,p25,p75,p90
+dependency_set,stargazers_count,1513,7283.485789821547,1191.0,292.0,5378.0,15495.0
+dependency_set,forks_count,1513,1287.4904163912756,196.0,56.0,865.0,2625.0
+dependency_set,total_committers,1242,206.74718196457326,47.0,20.0,144.0,506.0
+baseline_set,stargazers_count,219,496.8904109589041,2.0,0.0,12.0,233.0
+baseline_set,forks_count,219,107.22374429223744,0.0,0.0,4.0,71.0
+baseline_set,total_committers,41,98.1951219512195,13.0,3.0,47.0,245.0
