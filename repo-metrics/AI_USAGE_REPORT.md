@@ -65,6 +65,18 @@ precise annual figure. (An earlier pass at ~10 packages/quarter found
 73.3% here, on more than 3x that sample, is the number to trust; the
 overall shape and every other year are essentially unchanged.)
 
+**These rates are specific to this project's star-sampled discovery
+method, and are substantially inflated relative to the true PyPI
+population.** [UNBIASED_COHORT_REPORT.md](UNBIASED_COHORT_REPORT.md)
+reran this same scan on a uniformly-random sample of newborn PyPI
+packages instead of a GitHub-star-ranked one: the 2025 rate drops from
+51.7% to 10.8%, and 2026 from 73.3% to 43.3%. The rise-after-ChatGPT
+shape holds in both, but the star-sampled cohort's numbers should not be
+read as this project's estimate of true ecosystem-wide adoption — they
+measure adoption among packages popular enough to be found by a
+stars-sorted search, which is a meaningfully different (and higher)
+number.
+
 ## This overtook AI-SDK topic dependence around 2024–2025
 
 ![Usage vs. topic](output/ai_signal/charts/adoption_vs_sdk_timeline.png)

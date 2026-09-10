@@ -23,6 +23,12 @@ and see whether the <em>starting</em> shape of a newly-created package has
 changed across 51 birth-cohorts. Methodology, the discovery/validation
 pipeline, and every caveat are in <a href="README.html#vintage-cohort-study-separate-from-the-above">README.md</a>;
 this document is the findings.</p>
+<p><strong>This cohort is discovered via GitHub-star-ranked search — see
+<a href="UNBIASED_COHORT_REPORT.html">UNBIASED_COHORT_REPORT.md</a> for a parallel,
+unbiased cohort sampled directly from the full PyPI population.</strong> Most
+of this report's structural trends replicate there (smaller magnitude,
+same direction); the contributor-count growth trend below does not — it
+turns out to be a sampling artifact, not a population-wide effect.</p>
 <p><strong>Sample:</strong> 1,530 packages across 51 quarters (2014Q1–2026Q3), a clean 30
 every quarter (no shortfalls at any point in this run — a wider discovery
 net than the original 10/quarter pass), from 3,220 GitHub candidates
@@ -177,6 +183,20 @@ Nothing in this dataset can fully separate "packages are written
 differently now" from "popular new packages get more attention faster
 now, and more attention means more code, faster." Both are probably true
 to some degree; this study cannot apportion the split.</p>
+<p><strong>Update: this speculation is now confirmed, not just plausible.</strong>
+<a href="UNBIASED_COHORT_REPORT.html">UNBIASED_COHORT_REPORT.md</a> reran the same
+extraction on a uniformly-random sample of the true PyPI population
+instead of a star-ranked one. The +253% contributor-growth trend
+vanishes entirely there (~flat, not statistically significant) — a
+randomly-sampled newborn package has a median of 1 contributor in
+nearly every quarter from 2014 to 2026. It really was this sample's own
+star-selection method producing that trend, not a population-wide shift.
+The code-shape metrics (function length, complexity, docstring rate)
+fared better: they replicate in direction on the unbiased population too
+(at smaller magnitude), so "packages are written differently now" holds
+up better than "popular new packages get more attention faster" does —
+though per the paragraph above, this study still can't fully separate
+the two even with that result in hand.</p>
 <hr />
 <h2 id="sample-health">Sample health</h2>
 <p><img class="img-fluid rounded border my-3" alt="Sample health" src="../../repo-metrics/output/vintage/charts/vintage_sample_health.png" /></p>

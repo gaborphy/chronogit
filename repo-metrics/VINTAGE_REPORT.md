@@ -9,6 +9,13 @@ changed across 51 birth-cohorts. Methodology, the discovery/validation
 pipeline, and every caveat are in [README.md](README.md#vintage-cohort-study-separate-from-the-above);
 this document is the findings.
 
+**This cohort is discovered via GitHub-star-ranked search — see
+[UNBIASED_COHORT_REPORT.md](UNBIASED_COHORT_REPORT.md) for a parallel,
+unbiased cohort sampled directly from the full PyPI population.** Most
+of this report's structural trends replicate there (smaller magnitude,
+same direction); the contributor-count growth trend below does not — it
+turns out to be a sampling artifact, not a population-wide effect.
+
 **Sample:** 1,530 packages across 51 quarters (2014Q1–2026Q3), a clean 30
 every quarter (no shortfalls at any point in this run — a wider discovery
 net than the original 10/quarter pass), from 3,220 GitHub candidates
@@ -142,6 +149,21 @@ Nothing in this dataset can fully separate "packages are written
 differently now" from "popular new packages get more attention faster
 now, and more attention means more code, faster." Both are probably true
 to some degree; this study cannot apportion the split.
+
+**Update: this speculation is now confirmed, not just plausible.**
+[UNBIASED_COHORT_REPORT.md](UNBIASED_COHORT_REPORT.md) reran the same
+extraction on a uniformly-random sample of the true PyPI population
+instead of a star-ranked one. The +253% contributor-growth trend
+vanishes entirely there (~flat, not statistically significant) — a
+randomly-sampled newborn package has a median of 1 contributor in
+nearly every quarter from 2014 to 2026. It really was this sample's own
+star-selection method producing that trend, not a population-wide shift.
+The code-shape metrics (function length, complexity, docstring rate)
+fared better: they replicate in direction on the unbiased population too
+(at smaller magnitude), so "packages are written differently now" holds
+up better than "popular new packages get more attention faster" does —
+though per the paragraph above, this study still can't fully separate
+the two even with that result in hand.
 
 ---
 
