@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>npm's archived-package churn is large enough to change a published exponent - ChronoGit Research Diary</title>
+<link rel="stylesheet" href="../vendor/bootstrap-yeti.min.css">
+<link rel="stylesheet" href="report.css">
+</head>
+<body>
+  <nav class="navbar navbar-expand navbar-dark bg-primary mb-4">
+    <div class="container">
+      <a class="navbar-brand mb-0 h1" href="../index.html">&larr; ChronoGit Research Diary</a>
+    </div>
+  </nav>
+  <div class="container report-container">
+<h1 id="npms-archived-package-churn-is-large-enough-to-change-a-published-exponent">npm's archived-package churn is large enough to change a published exponent</h1>
+<p><strong>Question:</strong> in <code>cl_ecosystem_networks</code> (the separate academic project this
+diary already tracks — see
+<a href="AI_DEPENDENCY_NETWORK_REPORT.html#connection-to-cl_ecosystem_networks"><code>AI_DEPENDENCY_NETWORK_REPORT.md</code>'s connection section</a>),
+npm's registry carries a large population of packages flagged
+<code>unpublished</code>/<code>removed</code>/<code>deprecated</code>. Does leaving them in the dependency
+graph meaningfully change that project's own published network statistics
+and model fits? <strong>Yes.</strong> Excluding them shifts the fitted in-degree
+power-law exponent from 2.67 to 1.75 at the same snapshot — not a small
+correction, a qualitatively different distribution shape — and the
+project's own previously-published γ≈1.82 figure only replicates once
+archived packages are removed.</p>
+<p>This report summarizes a session spent inside <code>cl_ecosystem_networks</code>
+(<code>~/Documents_alt/Research/cl_ecosystem_networks/</code>, explored and extended
+directly, not read-only this time — new scripts were added there) marking
+and excluding npm's archived-status packages, then re-running that
+project's own degree-distribution and tinkering-model fitting methodology
+on the resulting "active-only" network. Full detail lives in that
+project's own session log,
+<code>quality_reports/session_logs/2026-09-24_mark-archived-npm-packages.md</code>.</p>
+<h2 id="what-archived-means-here">What "archived" means here</h2>
+<p><code>cl_ecosystem_networks</code> ingests the ecosyste.ms bulk data release, whose
+<code>packages</code> table carries the npm registry's own <code>status</code> field. Of
+5,325,740 total npm packages in that data:</p>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th>status</th>
+<th>count</th>
+<th>%</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>active (<code>NULL</code>)</td>
+<td>3,423,886</td>
+<td>64.3%</td>
+</tr>
+<tr>
+<td>unpublished</td>
+<td>1,420,645</td>
+<td>26.7%</td>
+</tr>
+<tr>
+<td>removed</td>
+<td>383,290</td>
+<td>7.2%</td>
+</tr>
+<tr>
+<td>deprecated</td>
+<td>97,919</td>
+<td>1.8%</td>
+</tr>
+</tbody>
+</table>
+<p>36% of the entire npm registry carries a non-null status. This was
+confirmed as the intended definition of "archived" with the project's
+owner before building on it (a GitHub-repo-archived-flag interpretation
+was considered and rejected — ecosyste.ms doesn't carry that signal, and
+it wasn't what was meant).</p>
+<h2 id="method">Method</h2>
+<p>Two new scripts were added to <code>cl_ecosystem_networks/src/</code>:</p>
+<ul>
+<li><code>analysis/mark_archived_packages.py</code> — classifies every npm package by
+  status, writes small committed summary CSVs plus an external Parquet
+  lookup (too large for that project's <code>data/exports/</code> 1MB convention).</li>
+<li><code>analysis/network_stats_active.py</code>, <code>models/tinkering_model_active.py</code>,
+  <code>plotting/plot_degree_snapshots_active.py</code> — re-run that project's own
+  existing active-version-semantics DuckDB/Parquet methodology
+  (<code>densification_curves.py</code>'s pattern; <code>tinkering_model.py</code>'s degree-fit
+  and ODE-regression methodology, ported not imported, to avoid coupling
+  to a script flagged as legacy) with archived packages excluded as both
+  dependency source <strong>and</strong> target — the more aggressive of two
+  documented options, on the reasoning that a <code>removed</code>/<code>unpublished</code>
+  package is genuinely uninstallable, so counting it as a valid node
+  overstates the graph a developer can actually resolve today.</li>
+</ul>
+<p>npm-only (the only ecosystem with this marking); two structural snapshots
+(2021-01-01, 2024-07-01 — the parquet data's actual coverage boundary,
+not 2026 as that project's own older exports assume) and a monthly
+2020–2024 time series for the tinkering-model fit.</p>
+<h2 id="finding-1-archived-packages-are-co-mingled-through-the-network-not-off-to-the-side">Finding 1: archived packages are co-mingled through the network, not off to the side</h2>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th></th>
+<th>2021-01-01</th>
+<th>2024-07-01</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>unfiltered nodes / edges</td>
+<td>1,009,983 / 4,716,202</td>
+<td>3,442,564 / 27,120,742</td>
+</tr>
+<tr>
+<td>active-only nodes / edges</td>
+<td>908,263 / 4,050,364</td>
+<td>1,941,028 / 11,553,864</td>
+</tr>
+<tr>
+<td>archived share</td>
+<td>10% / 14%</td>
+<td><strong>44% / 57%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>By the most recent snapshot, archived packages are <strong>most of the raw
+graph's edges</strong>, and the share has grown sharply since 2021 — consistent
+with registry churn accumulating over time rather than a one-off event.
+Largest-weakly-connected-component fraction barely moves either way
+(~97%), so this isn't a separate archived island distorting connectivity
+counts; it's diffuse, present throughout the graph.</p>
+<h2 id="finding-2-this-changes-a-fitted-exponent-not-just-a-size-count">Finding 2: this changes a fitted exponent, not just a size count</h2>
+<p>Degree-distribution MLE fits (Clauset et al. power-law for in-degree,
+geometric MLE for out-degree) at 2024-07-01:</p>
+<table class="table table-striped table-bordered table-sm">
+<thead>
+<tr>
+<th></th>
+<th>active only</th>
+<th>unfiltered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>γ_in (in-degree power-law)</td>
+<td><strong>1.7495 ± 0.0015</strong></td>
+<td>2.6721 ± 0.0012</td>
+</tr>
+<tr>
+<td>λ_out (out-degree exponential)</td>
+<td>0.1469</td>
+<td>0.0872</td>
+</tr>
+<tr>
+<td>q = 1 − e^(−λ_out)</td>
+<td>0.1367</td>
+<td>0.0835</td>
+</tr>
+</tbody>
+</table>
+<p><code>cl_ecosystem_networks</code>' own <code>docs/synthesis_brief.md</code> previously reported
+"γ ≈ 1.82 (npm, 2020-01-01)." This session's active-only fit at
+2020-01-01 gives 1.825 — a near-exact replication, and a useful
+cross-check that the new methodology is consistent with the project's
+existing work. What it also means, read the other way: <strong>that earlier
+figure only holds because the network it was computed from was
+already, incidentally, mostly free of the archived-package churn that
+had by 2024 grown to 44–57% of the raw graph</strong> — a 2020 snapshot predates
+most of the accumulation this report measures. A 2024 fit computed
+without this exclusion would have reported γ≈2.67 instead, a materially
+different tail shape.</p>
+<h2 id="finding-3-the-tinkering-models-instability-is-not-caused-by-this-filtering">Finding 3: the tinkering model's instability is not caused by this filtering</h2>
+<p><code>cl_ecosystem_networks</code>' tinkering-model fit (Valverde &amp; Solé; <code>p</code>, <code>q</code>
+via <code>dL/dN = mp + mq·L/N</code>) already carries a documented limitation —
+their own brief calls it a "7–10× amplitude mismatch... initial condition
+dependence... unresolved." Refitting on the active-only network reproduces
+the same instability: <code>p</code> comes out unphysically negative in <em>both</em>
+variants at 2024-07-01 (active-only −0.43, unfiltered −0.31), and the
+expanding-window OLS swings wildly across the entire 2020–2024 series in
+both, not just at the archived-heavy tail. Worth stating plainly since
+it would be easy to mis-blame the archived-package filtering for this:
+<strong>it doesn't cause the instability, it was already there.</strong> <code>q</code> (from the
+degree-distribution MLE, not the OLS) is the only tinkering-model
+parameter reliable enough here to draw a comparison from, and it moves
+the same direction as γ_in and λ_out: 0.137 (active-only) vs. 0.084
+(unfiltered) at 2024-07-01.</p>
+<h2 id="caveat-carried-over-unresolved">Caveat carried over, unresolved</h2>
+<p>Both variants show a sharp jump in the last four months of parquet
+coverage (March→July 2024: active-only N rises 1.49M→1.83M, 23% in four
+months against a ~1–2%/month baseline; γ_in drops 1.818→1.750 over the
+same window). It shows up whether or not archived packages are excluded,
+so it isn't an artifact of this report's filtering — but it sits exactly
+at the data's coverage boundary, so it's equally consistent with a real
+late-2024 acceleration or a late bulk-import batch in how the source data
+was collected. <code>cl_ecosystem_networks</code>' own session log flags this
+explicitly as unresolved, not investigated further here.</p>
+<h2 id="connection-back-to-the-ai-breakpoint-question">Connection back to the AI-breakpoint question</h2>
+<p>This project's <a href="AI_DEPENDENCY_NETWORK_REPORT.html#connection-to-cl_ecosystem_networks"><code>AI_DEPENDENCY_NETWORK_REPORT.md</code></a>
+already names <code>cl_ecosystem_networks</code>' <code>ai_breakpoint_analysis.py</code>
+Chow-test result (npm: F=11.47, p=0.0001 at the ChatGPT release date, but
+not independently found by an unconstrained break search) as an open
+question this project's small AI-flagged sample couldn't help resolve at
+that project's scale. This report doesn't resolve it either, but adds a
+relevant methodological fact: <strong>that breakpoint analysis, like the
+γ≈1.82 figure above, was run on the unfiltered network</strong> — the same
+network now shown to be 44–57% archived-package edges at recent
+snapshots. Whether the post-2022 densification break survives
+archived-package exclusion is an open question this report does not
+attempt (the breakpoint script wasn't rerun on the active-only edge set),
+flagged here as the natural next step for whichever project picks it up.</p>
+  </div>
+</body>
+</html>
